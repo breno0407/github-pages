@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ebook Interativo: Receitas Fitness</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        .nav-button { 
+            transition: background-color 0.3s, color 0.3s; 
+            white-space: nowrap;
+        }
+        .nav-button.active { background-color: #34D399; color: white; }
+        .nav-button:not(.active):hover { background-color: #F3F4F6; }
+        .save-button { transition: background-color 0.3s; }
+        .recipe-card {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .recipe-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1), 0 4px 6px -2px rgba(0,0,0,0.05);
+        }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <div class="container mx-auto p-4 md:p-8 max-w-6xl">
+        
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-emerald-500">Receitas Fitness</h1>
+            <p class="text-stone-500 mt-2">Seu guia interativo para uma alimentação saudável e saborosa.</p>
+        </header>
+
+        <nav class="flex flex-wrap justify-center gap-2 md:gap-3 mb-4">
+            <button id="nav-intro" class="nav-button active text-sm md:text-base font-medium py-2 px-4 rounded-full border border-stone-200">Introdução</button>
+            <button data-category-key="cafe" class="nav-button category-nav-button text-sm md:text-base font-medium py-2 px-4 rounded-full border border-stone-200">Café da Manhã</button>
+            <button data-category-key="almoco" class="nav-button category-nav-button text-sm md:text-base font-medium py-2 px-4 rounded-full border border-stone-200">Almoço</button>
+            <button data-category-key="lanche" class="nav-button category-nav-button text-sm md:text-base font-medium py-2 px-4 rounded-full border border-stone-200">Lanche</button>
+            <button data-category-key="jantar" class="nav-button category-nav-button text-sm md:text-base font-medium py-2 px-4 rounded-full border border-stone-200">Jantar</button>
+            <button data-category-key="sobremesa" class="nav-button category-nav-button text-sm md:text-base font-medium py-2 px-4 rounded-full border border-stone-200">Sobremesa</button>
+            <button data-category-key="bebida" class="nav-button category-nav-button text-sm md:text-base font-medium py-2 px-4 rounded-full border border-stone-200">Bebida</button>
+        </nav>
+        <div class="text-center mb-8">
+            <button id="save-ebook-button" class="save-button bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-2 px-6 rounded-full text-sm md:text-base">
+                Salvar Ebook (.txt)
+            </button>
+        </div>
+
+        <main id="content-area" class="bg-white p-6 md:p-8 rounded-2xl shadow-sm border border-stone-100 min-h-[500px]">
+        </main>
+
+    </div>
+
+    <script>
+        const contentData = {
+            intro: {
+                title: 'Sabor e Saúde no Seu Prato',
+                content: `
+                    <div class="text-center">
+                        <h3 class="text-2xl font-bold text-emerald-500 mb-4">Bem-vindo(a)!</h3>
+                        <p class="text-stone-600 mb-4">Alcançar seus objetivos fitness vai muito além dos treinos. Uma alimentação equilibrada é fundamental para fornecer energia, promover a recuperação muscular e otimizar seus resultados.</p>
+                        <p class="text-stone-600">Este guia foi criado para mostrar que comida fitness pode ser deliciosa, prática e variada. Navegue pelas categorias acima para descobrir uma vasta coleção de receitas completas, com explicações sobre seus benefícios, listas de ingredientes e um passo a passo detalhado. Prepare-se para transformar sua rotina alimentar!</p>
+                    </div>
+                `
+            },
+            receitas: {
+                // CAFÉ DA MANHÃ
+                cafe_overnight: { 
+                    id: 'cafe_overnight', categoryKey: 'cafe', categoryName: "Café da Manhã", title: 'Overnight Oats Proteico', 
+                    explanation: 'O "Overnight Oats" é uma opção de café da manhã prática e nutritiva. Ao deixar a aveia de molho, ela amolece e absorve sabores, resultando em uma textura cremosa. Esta versão é turbinada com proteína, essencial para a construção muscular e para promover maior saciedade ao longo da manhã.',
+                    ingredients: ["1/2 xícara (50g) de aveia em flocos", "1 xícara (240ml) de leite (vaca, amêndoas, coco, etc.)", "1 colher de sopa (15g) de sementes de chia", "1 scoop (30g) de whey protein (baunilha ou chocolate)", "Adoçante natural a gosto (mel, stevia, etc.)", "Frutas picadas para cobrir", "Opcional: nozes, castanhas, pasta de amendoim"],
+                    steps: [
+                        "Escolha um pote de vidro com tampa ou outro recipiente que possa ser bem vedado, com capacidade para pelo menos 350-400ml.",
+                        "No pote, coloque a aveia em flocos, as sementes de chia (se for usar) e o scoop de whey protein.",
+                        "Adicione o leite de sua preferência sobre os ingredientes secos.",
+                        "Se for utilizar adoçante, adicione-o neste momento.",
+                        "Com uma colher, misture vigorosamente todos os ingredientes até que o whey protein esteja completamente dissolvido e não haja grumos. Certifique-se de raspar as laterais e o fundo do pote.",
+                        "Tampe bem o pote e leve à geladeira. Deixe descansar por, no mínimo, 4 horas. Para melhores resultados e textura, deixe pernoitar (aproximadamente 8 horas).",
+                        "Na manhã seguinte, retire o overnight oats da geladeira. A mistura deverá estar espessa e cremosa.",
+                        "Se a consistência estiver muito densa para o seu paladar, adicione um pouco mais de leite (1-2 colheres de sopa por vez) e misture até atingir a cremosidade desejada.",
+                        "Transfira para uma tigela, se preferir, ou consuma diretamente no pote. Cubra com suas frutas frescas picadas favoritas, nozes, castanhas ou uma colher de pasta de amendoim.",
+                        "Sirva gelado e aproveite seu café da manhã nutritivo!"
+                    ],
+                    macros: { "Proteínas": 35, "Carboidratos": 45, "Gorduras": 20 },
+                    imagePlaceholder: "🥣"
+                },
+                cafe_panqueca: { 
+                    id: 'cafe_panqueca', categoryKey: 'cafe', categoryName: "Café da Manhã", title: 'Panqueca de Banana Fit', 
+                    explanation: 'Uma opção rápida, deliciosa e saudável para o café da manhã ou lanche. Rica em fibras da aveia e proteínas do ovo, com a doçura natural da banana.',
+                    ingredients: ["1 banana madura amassada", "1 ovo", "2 colheres de sopa de farelo de aveia ou farinha de aveia", "1 colher de chá de canela em pó (opcional)", "Óleo de coco ou azeite para untar"],
+                    steps: [
+                        "Em uma tigela média, adicione a banana madura e amasse-a completamente com um garfo até obter um purê liso.",
+                        "Quebre o ovo na tigela sobre a banana amassada. Adicione o farelo de aveia (ou farinha de aveia) e a canela em pó (se for usar).",
+                        "Misture todos os ingredientes vigorosamente com o garfo ou um pequeno batedor de arame até obter uma massa homogênea e bem incorporada.",
+                        "Leve uma frigideira antiaderente pequena (aproximadamente 15-20 cm de diâmetro) ao fogo baixo.",
+                        "Unte levemente a frigideira com uma pequena quantidade de óleo de coco ou azeite, espalhando com um papel toalha se necessário.",
+                        "Quando a frigideira estiver aquecida, despeje aproximadamente metade da massa, espalhando-a delicadamente com as costas de uma colher para formar uma panqueca redonda.",
+                        "Cozinhe em fogo baixo por cerca de 2-3 minutos, ou até que as bordas comecem a firmar e pequenas bolhas apareçam na superfície.",
+                        "Com uma espátula, vire cuidadosamente a panqueca e cozinhe do outro lado por mais 1-2 minutos, ou até que esteja dourada e cozida por completo.",
+                        "Retire a panqueca da frigideira e reserve. Repita o processo com o restante da massa para fazer a segunda panqueca.",
+                        "Sirva as panquecas quentes. Elas podem ser consumidas puras ou acompanhadas de frutas frescas picadas, um fio de mel, iogurte natural ou pasta de amendoim."
+                    ],
+                    macros: { "Proteínas": 20, "Carboidratos": 60, "Gorduras": 20 },
+                    imagePlaceholder: "🥞"
+                },
+                cafe_smoothie_verde: {
+                    id: 'cafe_smoothie_verde', categoryKey: 'cafe', categoryName: "Café da Manhã", title: 'Smoothie Verde Energizante',
+                    explanation: 'Comece o dia com um impulso de energia e nutrientes com este smoothie verde. Rico em vitaminas, minerais e antioxidantes.',
+                    ingredients: ["1 xícara de espinafre fresco", "1/2 maçã verde", "1/2 pepino", "Suco de 1/2 limão", "150ml de água de coco ou água", "Gengibre a gosto (opcional)"],
+                    steps: [
+                        "Lave cuidadosamente o espinafre fresco, a maçã verde e o pepino em água corrente.",
+                        "Corte a maçã verde ao meio e retire as sementes. Não é necessário descascar se for orgânica. Pique em pedaços menores.",
+                        "Corte o pepino em rodelas ou pedaços menores.",
+                        "No copo do liquidificador, adicione as folhas de espinafre, os pedaços de maçã, os pedaços de pepino, o suco de limão espremido na hora e a água de coco (ou água filtrada).",
+                        "Se desejar um toque picante e termogênico, adicione um pequeno pedaço de gengibre fresco descascado e picado.",
+                        "Tampe o liquidificador e bata em velocidade alta por aproximadamente 1 a 2 minutos, ou até que a mistura esteja completamente lisa, sem pedaços visíveis de folhas ou frutas.",
+                        "Verifique a consistência. Se o smoothie estiver muito espesso para o seu gosto, adicione um pouco mais de água de coco ou água filtrada e bata rapidamente para incorporar.",
+                        "Despeje o smoothie verde em um copo grande.",
+                        "Sirva imediatamente para aproveitar ao máximo os nutrientes e o frescor. Opcionalmente, adicione algumas pedras de gelo se preferir mais gelado."
+                    ],
+                    macros: { "Proteínas": 10, "Carboidratos": 70, "Gorduras": 20 },
+                    imagePlaceholder: "🥤"
+                },
+                cafe_torrada_abacate: {
+                    id: 'cafe_torrada_abacate', categoryKey: 'cafe', categoryName: "Café da Manhã", title: 'Torrada Integral com Abacate e Ovo',
+                    explanation: 'Uma combinação clássica e nutritiva, fornecendo gorduras boas, proteínas e fibras.',
+                    ingredients: ["2 fatias de pão integral", "1/2 abacate amassado", "1 ovo pochê ou cozido", "Sal e pimenta a gosto", "Sementes de chia ou gergelim (opcional)"],
+                    steps: [
+                        "Prepare o ovo: Cozinhe um ovo da sua maneira preferida (pochê, cozido mole/duro, ou até mesmo mexido rapidamente). Se for ovo cozido, descasque e fatie ou pique.",
+                        "Enquanto o ovo cozinha, toste as duas fatias de pão integral na torradeira, forno ou frigideira até ficarem douradas e crocantes.",
+                        "Em uma tigela pequena, coloque a polpa de meio abacate maduro. Amasse bem com um garfo até obter a consistência desejada (pode ser mais pedaçudo ou completamente liso).",
+                        "Tempere o abacate amassado com uma pitada de sal e pimenta do reino moída na hora. Se desejar, adicione algumas gotas de suco de limão para realçar o sabor e evitar que escureça rapidamente.",
+                        "Espalhe generosamente o abacate amassado e temperado sobre as fatias de pão tostado.",
+                        "Acomode o ovo preparado (fatiado, picado ou o ovo pochê inteiro) sobre a camada de abacate.",
+                        "Finalize temperando o ovo com mais uma pitada de sal e pimenta, se necessário.",
+                        "Opcionalmente, polvilhe sementes de chia, gergelim, linhaça ou pimenta calabresa por cima para adicionar textura e nutrientes extras.",
+                        "Sirva imediatamente."
+                    ],
+                    macros: { "Proteínas": 25, "Carboidratos": 45, "Gorduras": 30 },
+                    imagePlaceholder: "🥑"
+                },
+                cafe_mingau_aveia: {
+                    id: 'cafe_mingau_aveia', categoryKey: 'cafe', categoryName: "Café da Manhã", title: 'Mingau de Aveia Quente',
+                    explanation: 'Confortável e nutritivo, ideal para dias mais frios, rico em fibras.',
+                    ingredients: ["1/2 xícara de aveia em flocos", "1 xícara de leite ou água", "Canela em pó a gosto", "Frutas vermelhas e nozes para cobrir"],
+                    steps: [
+                        "Em uma panela pequena, adicione a meia xícara de aveia em flocos e a xícara de leite (de vaca, vegetal) ou água.",
+                        "Leve ao fogo médio, mexendo ocasionalmente para não grudar no fundo da panela.",
+                        "Quando começar a ferver, reduza o fogo para baixo e continue cozinhando, mexendo constantemente, por cerca de 3-5 minutos, ou até o mingau engrossar e atingir a consistência desejada.",
+                        "Se preferir um mingau mais doce, adicione uma pitada de adoçante natural (como mel, xarope de ácer ou stevia) durante o cozimento, a gosto.",
+                        "Retire do fogo e despeje o mingau quente em uma tigela.",
+                        "Polvilhe generosamente com canela em pó.",
+                        "Adicione seus toppings favoritos: frutas vermelhas frescas ou congeladas (morangos, mirtilos, framboesas), banana fatiada, maçã picada, nozes, amêndoas, sementes de chia ou linhaça.",
+                        "Sirva imediatamente enquanto está quente e reconfortante."
+                    ],
+                    macros: { "Proteínas": 15, "Carboidratos": 65, "Gorduras": 20 },
+                    imagePlaceholder: "🥣"
+                },
+                cafe_omelete_claras: {
+                    id: 'cafe_omelete_claras', categoryKey: 'cafe', categoryName: "Café da Manhã", title: 'Omelete de Claras com Vegetais',
+                    explanation: 'Leve e rico em proteínas, com adição de vitaminas dos vegetais.',
+                    ingredients: ["3 claras de ovo", "Espinafre picado", "Cogumelos fatiados", "Tomate cereja cortado ao meio", "Sal e pimenta a gosto"],
+                    steps: [
+                        "Prepare os vegetais: Lave e pique o espinafre. Fatie os cogumelos. Corte os tomates cereja ao meio.",
+                        "Em uma tigela pequena, coloque as três claras de ovo. Tempere com uma pitada de sal e pimenta do reino moída na hora.",
+                        "Bata as claras levemente com um garfo ou batedor de arame por cerca de 30 segundos, apenas para incorporar os temperos e deixá-las um pouco aeradas.",
+                        "Aqueça uma frigideira antiaderente pequena em fogo médio. Se necessário, unte com uma gota de azeite ou spray de cozinha.",
+                        "Adicione os cogumelos fatiados à frigideira e refogue por 2-3 minutos, até começarem a amolecer. Adicione o espinafre picado e refogue por mais 1 minuto, até murchar. Por último, adicione os tomates cereja e cozinhe por mais 30 segundos.",
+                        "Retire os vegetais refogados da frigideira e reserve.",
+                        "Na mesma frigideira (limpe se necessário e re-unte levemente), despeje as claras batidas, espalhando para cobrir o fundo.",
+                        "Cozinhe em fogo médio-baixo por 1-2 minutes, até as bordas começarem a firmar.",
+                        "Distribua os vegetais refogados sobre uma metade da omelete.",
+                        "Com uma espátula, dobre a outra metade da omelete sobre os vegetais.",
+                        "Cozinhe por mais 1-2 minutos, ou até que a omelete esteja cozida por completo e levemente dourada. Vire se desejar dourar ambos os lados.",
+                        "Deslize a omelete para um prato e sirva imediatamente."
+                    ],
+                    macros: { "Proteínas": 40, "Carboidratos": 20, "Gorduras": 40 },
+                    imagePlaceholder: "🍳"
+                },
+                cafe_iogurte_granola: {
+                    id: 'cafe_iogurte_granola', categoryKey: 'cafe', categoryName: "Café da Manhã", title: 'Iogurte com Granola Caseira',
+                    explanation: 'Rápido, prático e cheio de probióticos e fibras.',
+                    ingredients: ["1 pote de iogurte natural desnatado", "3 colheres de sopa de granola caseira sem açúcar", "Mel ou frutas picadas a gosto"],
+                    steps: [
+                        "Em uma tigela ou copo, coloque o pote de iogurte natural desnatado.",
+                        "Adicione as três colheres de sopa de granola caseira sem açúcar por cima do iogurte.",
+                        "Se desejar um toque extra de doçura e sabor, regue com um fio de mel (aproximadamente 1 colher de chá) ou adicione frutas frescas picadas de sua preferência (como morangos, bananas, mirtilos).",
+                        "Misture levemente se preferir, ou consuma em camadas para manter a crocância da granola.",
+                        "Sirva imediatamente."
+                    ],
+                    macros: { "Proteínas": 25, "Carboidratos": 55, "Gorduras": 20 },
+                    imagePlaceholder: "🥛"
+                },
+
+                // ALMOÇO
+                almoco_salmao: { 
+                    id: 'almoco_salmao', categoryKey: 'almoco', categoryName: "Almoço", title: 'Salmão Grelhado com Quinoa e Legumes', 
+                    explanation: 'Este prato é uma combinação poderosa de nutrientes. O salmão é uma fonte de proteína de alta qualidade e ômega-3. A quinoa é rica em proteínas e fibras. Os legumes assados fornecem uma variedade de vitaminas, contribuindo para a saciedade e o bom funcionamento do organismo.',
+                    ingredients: ["2 filés de salmão (150-200g cada)", "Suco de 1/2 limão, 1 dente de alho picado", "1/2 xícara (100g) de quinoa crua, 1 xícara (240ml) de água", "2 xícaras de legumes variados (brócolis, cenoura, abobrinha)", "Azeite extra virgem, sal, pimenta e temperos a gosto"],
+                    steps: [
+                        "Pré-aqueça o forno a 200°C.",
+                        "Lave e prepare os legumes: corte o brócolis em floretes, a cenoura em rodelas ou palitos, e a abobrinha em cubos ou fatias. Outros legumes como pimentões coloridos também são ótimas opções.",
+                        "Em uma tigela grande, misture os legumes picados com 1 colher de sopa de azeite extra virgem, sal, pimenta do reino e os temperos de sua escolha (páprica, orégano, tomilho).",
+                        "Espalhe os legumes temperados em uma assadeira grande, em camada única para que assem por igual. Leve ao forno pré-aquecido por cerca de 20-30 minutos, virando na metade do tempo, até ficarem macios e levemente dourados.",
+                        "Enquanto os legumes assam, prepare a quinoa: Lave bem a 1/2 xícara de quinoa crua em água corrente, esfregando os grãos entre as mãos, para remover a saponina (substância que pode deixar um sabor amargo). Escorra bem.",
+                        "Em uma panela média, coloque a quinoa lavada e 1 xícara de água ou caldo de legumes caseiro. Adicione uma pitada de sal.",
+                        "Leve ao fogo alto até ferver. Assim que levantar fervura, reduza o fogo para o mínimo, tampe a panela e cozinhe por cerca de 15 minutos, ou até toda a água ser absorvida e os grãos ficarem macios e translúcidos (um anel branco aparecerá ao redor do grão).",
+                        "Desligue o fogo e deixe a quinoa descansar tampada por mais 5 minutos. Depois, solte os grãos delicadamente com um garfo.",
+                        "Tempere os filés de salmão: Seque os filés com papel toalha. Tempere ambos os lados com o suco de meio limão, o dente de alho picado ou amassado, sal e pimenta do reino a gosto. Se desejar, adicione ervas frescas picadas como dill, salsinha ou cebolinha.",
+                        "Aqueça 1 colher de sopa de azeite extra virgem em uma frigideira antiaderente grande em fogo médio-alto.",
+                        "Quando a frigideira estiver bem quente, coloque os filés de salmão com o lado da pele para baixo (se houver pele). Pressione levemente com uma espátula por alguns segundos para garantir que a pele fique crocante.",
+                        "Grelhe por cerca de 4-6 minutos do lado da pele, ou até que a pele esteja dourada e crocante e o salmão cozido até a metade da altura do filé.",
+                        "Vire os filés com cuidado e grelhe do outro lado por mais 2-4 minutos, dependendo da espessura do filé e do seu ponto de preferência. O salmão estará pronto quando estiver cozido por dentro (opaco) mas ainda úmido. Evite cozinhar demais para não ressecar.",
+                        "Para montar o prato, sirva um filé de salmão grelhado acompanhado de uma porção de quinoa cozida e uma generosa porção dos legumes assados."
+                    ],
+                    macros: { "Proteínas": 40, "Carboidratos": 35, "Gorduras": 25 },
+                    imagePlaceholder: "🐟"
+                },
+                almoco_salada: { 
+                    id: 'almoco_salada', categoryKey: 'almoco', categoryName: "Almoço", title: 'Salada Completa com Frango e Molho de Iogurte', 
+                    explanation: 'Uma salada refrescante, nutritiva e completa, perfeita para um almoço leve e cheio de sabor. Combina proteínas magras, uma variedade de vegetais e um molho cremoso e saudável.',
+                    ingredients: ["150g de peito de frango grelhado ou desfiado", "Mix de folhas verdes (alface, rúcula, agrião)", "1/2 pepino cortado em rodelas", "1 tomate pequeno picado", "1/2 cenoura ralada", "2 colheres de sopa de milho cozido", "Para o molho: 2 colheres de sopa de iogurte natural desnatado, suco de 1/4 limão, 1 colher de chá de mostarda, sal, pimenta e ervas finas a gosto"],
+                    steps: [
+                        "Prepare o frango: Se estiver usando peito de frango cru, grelhe-o em uma frigideira com um fio de azeite até estar cozido por completo. Tempere com sal e pimenta. Deixe esfriar um pouco e desfie ou corte em cubos. Se já tiver frango cozido, apenas desfie ou pique.",
+                        "Lave e higienize cuidadosamente todas as folhas verdes (alface, rúcula, agrião). Seque-as bem, utilizando uma centrífuga de saladas ou papel toalha.",
+                        "Prepare os vegetais: Lave o pepino e corte em rodelas finas. Lave o tomate e pique em cubos pequenos. Descasque e rale a cenoura.",
+                        "Em uma saladeira grande ou prato individual, disponha o mix de folhas verdes como base.",
+                        "Distribua harmoniosamente sobre as folhas o pepino fatiado, o tomate picado, a cenoura ralada e o milho cozido (escorrido).",
+                        "Adicione o frango grelhado (desfiado ou em cubos) sobre os vegetais.",
+                        "Prepare o molho: Em uma tigela pequena ou potinho com tampa, misture bem as 2 colheres de sopa de iogurte natural desnatado, o suco de 1/4 de limão, 1 colher de chá de mostarda Dijon (ou amarela), uma pitada de sal, pimenta do reino moída na hora e ervas finas a gosto (como orégano, salsinha desidratada, cebolinha).",
+                        "Regue a salada com o molho de iogurte no momento de servir, ou sirva o molho à parte para que cada um se sirva.",
+                        "Misture delicadamente antes de consumir, se desejar."
+                    ],
+                    macros: { "Proteínas": 45, "Carboidratos": 30, "Gorduras": 25 },
+                    imagePlaceholder: "🥗"
+                },
+                almoco_wrap_frango: {
+                    id: 'almoco_wrap_frango', categoryKey: 'almoco', categoryName: "Almoço", title: 'Wrap Integral de Frango com Húmus',
+                    explanation: 'Prático e delicioso, este wrap é uma refeição completa e fácil de transportar.',
+                    ingredients: ["1 tortilha integral (tipo Rap10 ou similar)", "100g de frango cozido e desfiado, já temperado", "2 colheres de sopa de húmus (pasta de grão de bico)", "Folhas de alface americana ou rúcula", "Rodelas finas de tomate", "Opcional: cenoura ralada, pepino em tiras finas"],
+                    steps: [
+                        "Se o frango desfiado não estiver temperado, tempere-o com sal, pimenta, páprica e um fio de azeite.",
+                        "Aqueça levemente a tortilha integral em uma frigideira antiaderente por cerca de 30 segundos de cada lado, apenas para amolecer e facilitar o manuseio.",
+                        "Retire a tortilha da frigideira e coloque-a em um prato ou superfície limpa.",
+                        "Espalhe as 2 colheres de sopa de húmus uniformemente sobre a superfície da tortilha, deixando uma pequena borda livre.",
+                        "Distribua as folhas de alface (e/ou rúcula) sobre o húmus.",
+                        "Adicione o frango desfiado temperado sobre as folhas.",
+                        "Coloque as rodelas de tomate e outros vegetais opcionais (cenoura, pepino) por cima do frango.",
+                        "Dobre as laterais da tortilha para dentro (cerca de 2cm de cada lado) e depois enrole-a firmemente de baixo para cima, formando um wrap.",
+                        "Se desejar, corte o wrap ao meio na diagonal para facilitar o consumo.",
+                        "Sirva imediatamente ou embale em papel alumínio ou filme plástico para levar como lanche ou marmita."
+                    ],
+                    macros: { "Proteínas": 35, "Carboidratos": 40, "Gorduras": 25 },
+                    imagePlaceholder: "🌯"
+                },
+                almoco_bife_pure: {
+                    id: 'almoco_bife_pure', categoryKey: 'almoco', categoryName: "Almoço", title: 'Bife Magro com Purê de Mandioquinha',
+                    explanation: 'Uma refeição reconfortante e nutritiva, com proteína magra e carboidrato de boa qualidade.',
+                    ingredients: ["150g de bife de corte magro (patinho, alcatra, filé mignon)", "1 dente de alho amassado", "Sal e pimenta do reino a gosto", "1 colher de chá de azeite", "2 mandioquinhas (batata baroa) médias cozidas", "1 colher de sopa de leite desnatado ou creme de ricota light (opcional, para o purê)", "Noz-moscada ralada a gosto (para o purê)", "Salada colorida para acompanhar (folhas, tomate, pepino)"],
+                    steps: [
+                        "Tempere o bife com o alho amassado, sal e pimenta do reino a gosto. Deixe marinar por alguns minutos, se tiver tempo.",
+                        "Enquanto isso, prepare o purê: Descasque as mandioquinhas cozidas e amasse-as bem com um garfo ou espremedor de batatas até obter um purê liso.",
+                        "Se desejar um purê mais cremoso, adicione a colher de sopa de leite desnatado ou creme de ricota light e misture bem. Tempere com sal e uma pitada de noz-moscada ralada.",
+                        "Aqueça o azeite em uma frigideira antiaderente ou grelha em fogo médio-alto.",
+                        "Grelhe o bife por cerca de 3-5 minutos de cada lado, dependendo da espessura e do ponto desejado (mal passado, ao ponto, bem passado). Evite furar a carne para não perder os sucos.",
+                        "Retire o bife da frigideira e deixe descansar por alguns minutos antes de servir, para que os sucos se redistribuam.",
+                        "Prepare a salada colorida lavando e cortando as folhas, tomate e pepino. Tempere a gosto com azeite, vinagre ou limão e sal.",
+                        "Sirva o bife grelhado acompanhado do purê de mandioquinha e da salada colorida."
+                    ],
+                    macros: { "Proteínas": 40, "Carboidratos": 40, "Gorduras": 20 },
+                    imagePlaceholder: "🥩"
+                },
+                 almoco_lasanha_abobrinha: {
+                    id: 'almoco_lasanha_abobrinha', categoryKey: 'almoco', categoryName: "Almoço", title: 'Lasanha de Abobrinha Fit',
+                    explanation: 'Uma versão leve e low-carb da lasanha tradicional, usando abobrinha no lugar da massa.',
+                    ingredients: ["2 abobrinhas grandes", "300g de ricota fresca amassada", "1 xícara de espinafre fresco cozido, espremido e picado", "1/2 cebola pequena picada", "1 dente de alho picado", "2 xícaras de molho de tomate caseiro (sem açúcar)", "50g de queijo parmesão ralado light", "Sal, pimenta do reino e noz-moscada a gosto", "Azeite para refogar"],
+                    steps: [
+                        "Lave bem as abobrinhas. Com um mandoline ou fatiador de legumes, corte-as em fatias finas no sentido do comprimento (como se fossem lâminas de lasanha).",
+                        "Aqueça uma frigideira grande ou grelha antiaderente. Grelhe levemente as fatias de abobrinha dos dois lados, apenas para amaciarem um pouco e perderem o excesso de água. Reserve.",
+                        "Prepare o recheio: Em uma tigela, misture a ricota amassada com o espinafre picado. Tempere com sal, pimenta do reino e noz-moscada a gosto.",
+                        "Opcional (para mais sabor no recheio): Em uma panela pequena, aqueça um fio de azeite e refogue a cebola e o alho picados até dourarem. Adicione esta mistura à ricota com espinafre.",
+                        "Montagem: Preaqueça o forno a 180°C. Em um refratário médio, espalhe uma fina camada de molho de tomate no fundo.",
+                        "Faça a primeira camada com as fatias de abobrinha grelhadas, sobrepondo-as ligeiramente para cobrir o fundo.",
+                        "Cubra com uma camada da mistura de ricota e espinafre.",
+                        "Adicione mais uma camada de molho de tomate sobre a ricota.",
+                        "Repita as camadas: abobrinha, recheio de ricota, molho de tomate, até terminarem os ingredientes, finalizando com uma camada de molho de tomate.",
+                        "Polvilhe o queijo parmesão ralado light por cima.",
+                        "Leve ao forno pré-aquecido por cerca de 25-30 minutos, ou até a lasanha estar borbulhante e o queijo gratinado e dourado.",
+                        "Deixe descansar por alguns minutos antes de cortar e servir."
+                    ],
+                    macros: { "Proteínas": 30, "Carboidratos": 30, "Gorduras": 40 },
+                    imagePlaceholder: "🥘"
+                },
+                almoco_peixe_batata_doce: {
+                    id: 'almoco_peixe_batata_doce', categoryKey: 'almoco', categoryName: "Almoço", title: 'Peixe Assado com Batata Doce',
+                    explanation: 'Refeição leve, rica em ômega-3 e carboidratos complexos, muito saborosa e fácil de fazer.',
+                    ingredients: ["1 filé de peixe branco firme (tilápia, pescada, saint peter - aprox. 150-200g)", "1 batata doce média (aprox. 200g)", "1/2 cebola roxa cortada em pétalas (opcional)", "Ramos de alecrim fresco", "Folhas de tomilho fresco", "2 colheres de sopa de azeite extra virgem", "Suco de 1/2 limão", "Sal e pimenta do reino moída na hora a gosto"],
+                    steps: [
+                        "Preaqueça o forno a 200°C.",
+                        "Lave bem a batata doce. Não é necessário descascar se a casca estiver fina e limpa, caso contrário, descasque. Corte em rodelas de aproximadamente 0,5 cm de espessura.",
+                        "Em uma tigela, tempere as rodelas de batata doce com metade do azeite (1 colher de sopa), sal, pimenta do reino, e metade das ervas (alecrim e tomilho). Misture bem.",
+                        "Disponha as rodelas de batata doce em uma assadeira antiaderente ou forrada com papel manteiga, formando uma camada única. Se for usar a cebola roxa, espalhe as pétalas entre as batatas.",
+                        "Leve a batata doce ao forno por cerca de 15 minutos para pré-assar.",
+                        "Enquanto a batata doce assa, tempere o filé de peixe: seque-o com papel toalha. Tempere ambos os lados com sal, pimenta do reino, o suco de limão, o restante do azeite (1 colher de sopa) e o restante das ervas frescas.",
+                        "Após os 15 minutos de pré-cozimento da batata doce, retire a assadeira do forno com cuidado.",
+                        "Acomode o filé de peixe temperado sobre as batatas doces na assadeira.",
+                        "Volte a assadeira ao forno por mais 12-18 minutos, ou até que o peixe esteja cozido (carne opaca e desfiando facilmente com um garfo) e a batata doce esteja macia e levemente dourada. O tempo pode variar conforme a espessura do filé.",
+                        "Retire do forno e sirva imediatamente. Pode acompanhar com uma salada verde."
+                    ],
+                    macros: { "Proteínas": 35, "Carboidratos": 45, "Gorduras": 20 },
+                    imagePlaceholder: "🎣"
+                },
+                almoco_strogonoff_fit: {
+                    id: 'almoco_strogonoff_fit', categoryKey: 'almoco', categoryName: "Almoço", title: 'Strogonoff de Frango Fit',
+                    explanation: 'Uma versão mais saudável e leve do clássico strogonoff, utilizando iogurte natural ou creme de ricota no lugar do creme de leite, mantendo o sabor delicioso.',
+                    ingredients: ["200g de peito de frango cortado em cubos ou tiras finas", "1/2 cebola média picada", "1 dente de alho picado", "100g de cogumelos frescos fatiados (Paris, shitake ou shimeji)", "1/2 xícara (120ml) de iogurte natural desnatado sem açúcar ou creme de ricota light", "1 colher de sopa de mostarda Dijon", "1 colher de sopa de extrato de tomate (ou ketchup sem açúcar, opcional)", "1 colher de chá de páprica doce", "Sal e pimenta do reino a gosto", "1 colher de chá de azeite", "Salsinha picada para finalizar", "Acompanhamento sugerido: arroz integral e batata palha assada (ou chips de batata doce)"],
+                    steps: [
+                        "Tempere os cubos de frango com sal, pimenta do reino e a páprica doce. Misture bem.",
+                        "Aqueça o azeite em uma frigideira grande antiaderente em fogo médio.",
+                        "Adicione o frango temperado e cozinhe até dourar por todos os lados. Retire o frango da frigideira e reserve.",
+                        "Na mesma frigideira, adicione a cebola picada e refogue até ficar translúcida. Adicione o alho picado e refogue por mais 1 minuto, cuidando para não queimar.",
+                        "Acrescente os cogumelos fatiados e cozinhe até amaciarem e liberarem um pouco de líquido, mexendo ocasionalmente.",
+                        "Adicione o extrato de tomate (ou ketchup sem açúcar) e a mostarda Dijon. Misture bem e cozinhe por 1 minuto.",
+                        "Retorne o frango dourado para a frigideira.",
+                        "Em uma tigela separada, misture bem o iogurte natural desnatado (ou creme de ricota light) para deixá-lo mais liso. Se estiver usando iogurte, é importante que ele esteja em temperatura ambiente para evitar que talhe ao entrar em contato com o calor.",
+                        "Reduza o fogo da frigideira para o mínimo. Adicione a mistura de iogurte (ou creme de ricota) ao frango e cogumelos. Misture delicadamente para incorporar todos os ingredientes e aquecer o molho. Não deixe ferver vigorosamente, especialmente se estiver usando iogurte, para evitar que talhe.",
+                        "Cozinhe por mais 2-3 minutos, apenas para aquecer bem e o molho engrossar levemente. Ajuste o sal e a pimenta, se necessário.",
+                        "Desligue o fogo, polvilhe com salsinha picada.",
+                        "Sirva imediatamente acompanhado de arroz integral e batata palha assada ou chips de batata doce para uma refeição completa e saudável."
+                    ],
+                    macros: { "Proteínas": 40, "Carboidratos": 35, "Gorduras": 25 },
+                    imagePlaceholder: "🍲"
+                },
+
+                // LANCHE (Mantendo os já detalhados e expandindo os demais)
+                lanche_muffin: { 
+                    id: 'lanche_muffin', categoryKey: 'lanche', categoryName: "Lanche", title: 'Muffins de Banana e Aveia', 
+                    explanation: 'Estes muffins são uma ótima opção de lanche para matar a vontade de doce sem açúcar refinado. A doçura vem das bananas maduras e a aveia adiciona fibras, promovendo saciedade. São perfeitos para um lanche rápido antes ou depois do treino.',
+                    ingredients: ["2 bananas nanicas maduras amassadas", "2 ovos grandes", "1/4 xícara (60ml) de iogurte natural ou leite", "1 colher de sopa de óleo de coco derretido", "1 colher de chá de extrato de baunilha (opcional)", "1 e 1/2 xícara (150g) de farinha de aveia (ou aveia em flocos finos)", "1 colher de chá de fermento em pó", "1/2 colher de chá de canela em pó (opcional)", "Pitada de sal", "Opcional: gotas de chocolate amargo (mínimo 70% cacau), nozes picadas, uvas passas"],
+                    steps: [
+                        "Preaqueça o forno a 180°C. Prepare forminhas de muffin, untando-as levemente com óleo de coco ou utilizando forminhas de papel.",
+                        "Em uma tigela grande, adicione as bananas maduras e amasse-as completamente com um garfo até obter um purê homogêneo.",
+                        "Adicione os ovos ao purê de banana e bata bem. Incorpore o iogurte natural (ou leite), o óleo de coco derretido e o extrato de baunilha (se usar). Misture até todos os ingredientes líquidos e úmidos estarem bem combinados.",
+                        "Em uma tigela separada, misture os ingredientes secos: a farinha de aveia, o fermento em pó, a canela em pó (se usar) e a pitada de sal.",
+                        "Adicione gradualmente a mistura de ingredientes secos à mistura de ingredientes úmidos. Misture delicadamente com uma espátula ou colher, apenas até incorporar. Evite misturar em excesso para que os muffins não fiquem duros.",
+                        "Se for adicionar algum opcional (gotas de chocolate, nozes picadas, uvas passas), incorpore-os à massa neste momento, misturando suavemente.",
+                        "Divida a massa igualmente entre as forminhas de muffin preparadas, preenchendo cada uma até cerca de 2/3 de sua capacidade.",
+                        "Leve ao forno preaquecido e asse por aproximadamente 20-25 minutos, ou até que os muffins estejam dourados e um palito inserido no centro de um deles saia limpo.",
+                        "Retire os muffins do forno e deixe-os esfriar nas forminhas por alguns minutos antes de transferi-los para uma grade para esfriarem completamente.",
+                        "Guarde em recipiente hermético em temperatura ambiente por até 3 dias ou na geladeira por até uma semana."
+                    ],
+                    macros: { "Proteínas": 15, "Carboidratos": 60, "Gorduras": 25 },
+                    imagePlaceholder: "🧁"
+                },
+                lanche_crepioca: { 
+                    id: 'lanche_crepioca', categoryKey: 'lanche', categoryName: "Lanche", title: 'Crepioca Recheada Fit', 
+                    explanation: 'Versátil e prática, a crepioca é uma excelente opção para lanches ou até mesmo um jantar leve. Feita com ovo e tapioca, é naturalmente sem glúten e pode ser recheada com ingredientes doces ou salgados.',
+                    ingredients: ["1 ovo inteiro (ou 2 claras)", "2 colheres de sopa de goma de tapioca hidratada", "1 pitada de sal", "Temperos a gosto (orégano, pimenta do reino, cúrcuma)", "Recheio a gosto: queijo cottage, frango desfiado temperado, atum sólido em água, tomate picado, rúcula, espinafre, pasta de amendoim integral, frutas picadas (banana, morango)."],
+                    steps: [
+                        "Em uma tigela pequena, quebre o ovo (ou adicione as claras). Adicione a goma de tapioca hidratada, a pitada de sal e os temperos de sua preferência.",
+                        "Com um garfo ou pequeno batedor de arame (fouet), misture vigorosamente todos os ingredientes até obter uma massa líquida e completamente homogênea, sem grumos de tapioca.",
+                        "Aqueça uma frigideira antiaderente pequena (aproximadamente 15-20 cm de diâmetro) em fogo baixo a médio-baixo. Se sua frigideira não for de excelente qualidade antiaderente, unte-a levemente com um fio de azeite ou óleo de coco, espalhando com papel toalha.",
+                        "Despeje a massa da crepioca na frigideira aquecida, girando a frigideira para que a massa se espalhe uniformemente e forme um disco fino.",
+                        "Cozinhe por cerca de 1 a 2 minutos, ou até que a massa comece a firmar e as bordas comecem a se soltar facilmente da frigideira. Você verá que a superfície perde o brilho de crua.",
+                        "Com o auxílio de uma espátula, vire a crepioca com cuidado e cozinhe do outro lado por mais 30 segundos a 1 minuto, apenas para firmar.",
+                        "Retire a crepioca da frigideira e coloque-a em um prato.",
+                        "Adicione o recheio de sua preferência sobre uma metade do disco da crepioca.",
+                        "Dobre a outra metade da crepioca sobre o recheio, formando uma meia-lua.",
+                        "Sirva imediatamente enquanto está quentinha."
+                    ],
+                    macros: { "Proteínas": 30, "Carboidratos": 50, "Gorduras": 20 },
+                    imagePlaceholder: "🌮"
+                },
+                lanche_palitos_cenoura: {
+                    id: 'lanche_palitos_cenoura', categoryKey: 'lanche', categoryName: "Lanche", title: 'Palitos de Vegetais com Húmus',
+                    explanation: 'Um lanche crocante, leve e rico em fibras e nutrientes. Ótimo para saciar a fome entre as refeições.',
+                    ingredients: ["1 cenoura média ou grande", "1 pepino japonês (ou 1/2 pepino comum)", "1 talo de aipo (salsão) - opcional", "4 colheres de sopa de húmus (pasta de grão de bico) pronto ou caseiro"],
+                    steps: [
+                        "Lave bem a cenoura. Descasque-a (opcional, se a casca estiver fina e limpa, pode manter). Corte as extremidades.",
+                        "Corte a cenoura ao meio no sentido do comprimento e, em seguida, corte cada metade em palitos de aproximadamente 1cm de espessura.",
+                        "Lave bem o pepino. Se for pepino comum, pode ser necessário retirar as sementes se forem muito grandes. Corte as extremidades.",
+                        "Corte o pepino em palitos de tamanho similar aos da cenoura.",
+                        "Se for usar aipo, lave bem o talo e corte em palitos.",
+                        "Disponha os palitos de vegetais em um prato ou pote.",
+                        "Coloque as 4 colheres de sopa de húmus em uma tigelinha à parte para mergulhar os palitos, ou diretamente no prato ao lado dos vegetais.",
+                        "Sirva como um lanche refrescante e saudável. Os palitos podem ser preparados com antecedência e guardados na geladeira em um recipiente com um pouco de água para manter a crocância."
+                    ],
+                    macros: { "Proteínas": 10, "Carboidratos": 60, "Gorduras": 30 },
+                    imagePlaceholder: "🥕"
+                },
+                lanche_mix_castanhas: {
+                    id: 'lanche_mix_castanhas', categoryKey: 'lanche', categoryName: "Lanche", title: 'Mix de Oleaginosas e Frutas Secas',
+                    explanation: 'Fonte de energia rápida, gorduras boas, proteínas e fibras. Ideal para levar na bolsa e consumir quando bater aquela fome.',
+                    ingredients: ["15g de amêndoas cruas (aproximadamente 10-12 unidades)", "15g de nozes (aproximadamente 2-3 nozes inteiras)", "1 castanha-do-pará", "1 colher de sopa de uvas passas (ou damascos secos picados, tâmaras picadas)"],
+                    steps: [
+                        "Separe a quantidade desejada de cada oleaginosa (amêndoas, nozes, castanha-do-pará).",
+                        "Se as nozes estiverem inteiras, quebre-as em pedaços menores com as mãos.",
+                        "Adicione a colher de sopa de frutas secas de sua preferência (uvas passas, damascos picados, etc.).",
+                        "Misture todos os ingredientes em um potinho pequeno com tampa ou saquinho reutilizável.",
+                        "Leve com você para consumir como lanche entre as refeições. Atenção à porção, pois as oleaginosas são calóricas, apesar de saudáveis."
+                    ],
+                    macros: { "Proteínas": 15, "Carboidratos": 35, "Gorduras": 50 },
+                    imagePlaceholder: "🌰"
+                },
+                lanche_bolinhas_energeticas: {
+                    id: 'lanche_bolinhas_energeticas', categoryKey: 'lanche', categoryName: "Lanche", title: 'Bolinhas Energéticas de Tâmara',
+                    explanation: 'Docinhas, sem açúcar refinado e cheias de energia. Ótimas para um pré-treino rápido ou para matar a vontade de doce de forma saudável.',
+                    ingredients: ["10 tâmaras Medjool (ou cerca de 15-20 tâmaras menores), sem caroço", "1/2 xícara de aveia em flocos (finos ou grossos)", "2 colheres de sopa de coco ralado sem açúcar", "1 colher de sopa de pasta de amendoim integral sem açúcar", "Opcional: 1 colher de chá de sementes de chia, cacau em pó para enrolar"],
+                    steps: [
+                        "Se as tâmaras estiverem muito secas, coloque-as de molho em água morna por cerca de 10-15 minutos para amolecer. Escorra bem a água antes de usar.",
+                        "Em um processador de alimentos, adicione as tâmaras sem caroço e processe até formar uma pasta pegajosa. Pode ser necessário parar e raspar as laterais do processador algumas vezes.",
+                        "Adicione à pasta de tâmaras a aveia em flocos, o coco ralado e a pasta de amendoim. Se for usar sementes de chia, adicione também.",
+                        "Processe novamente todos os ingredientes juntos até que a mistura esteja bem combinada e forme uma massa moldável. Se a massa estiver muito seca, adicione uma colher de chá de água; se estiver muito úmida, adicione um pouco mais de aveia.",
+                        "Com as mãos levemente umedecidas (para não grudar), pegue pequenas porções da massa (cerca de 1 colher de sopa) e enrole para formar bolinhas.",
+                        "Se desejar, passe as bolinhas prontas no coco ralado adicional ou no cacau em pó para uma cobertura extra.",
+                        "Coloque as bolinhas energéticas em um prato forrado com papel manteiga e leve à geladeira por pelo menos 30 minutos para firmarem.",
+                        "Guarde as bolinhas na geladeira em um recipiente hermético por até uma semana."
+                    ],
+                    macros: { "Proteínas": 10, "Carboidratos": 70, "Gorduras": 20 },
+                    imagePlaceholder: "🥥"
+                },
+                lanche_pao_queijo_fit: {
+                    id: 'lanche_pao_queijo_fit', categoryKey: 'lanche', categoryName: "Lanche", title: 'Pão de Queijo Fit de Tapioca',
+                    explanation: 'Uma versão mais leve e proteica do tradicional pão de queijo, utilizando tapioca e queijo cottage ou ricota.',
+                    ingredients: ["1 ovo inteiro", "3 colheres de sopa de goma de tapioca hidratada", "2 colheres de sopa de queijo cottage (ou ricota amassada)", "1 colher de sopa de queijo parmesão ralado light (ou queijo minas padrão ralado)", "1 pitada de sal (ajuste conforme o sal dos queijos)", "Opcional: 1 colher de chá de fermento em pó (para uma textura mais fofa)"],
+                    steps: [
+                        "Preaqueça o forno a 180-200°C.",
+                        "Em uma tigela, quebre o ovo e bata levemente com um garfo.",
+                        "Adicione a goma de tapioca, o queijo cottage (ou ricota amassada), o queijo parmesão ralado e a pitada de sal. Se for usar, adicione o fermento em pó.",
+                        "Misture bem todos os ingredientes com o garfo ou uma espátula até obter uma massa homogênea. A consistência será um pouco mais mole que a do pão de queijo tradicional.",
+                        "Prepare forminhas de empada, cupcake de silicone ou uma assadeira pequena antiaderente. Se não for antiaderente, unte levemente com azeite ou óleo de coco.",
+                        "Distribua a massa nas forminhas, preenchendo cerca de 2/3 de cada uma, ou faça pequenas porções na assadeira, como se fossem pãezinhos.",
+                        "Leve ao forno preaquecido por aproximadamente 20 a 25 minutos, ou até que os pãezinhos de queijo fit estejam dourados e inflados.",
+                        "Retire do forno e deixe amornar um pouco antes de desenformar (se estiver usando forminhas de metal).",
+                        "Sirva quente ou em temperatura ambiente."
+                    ],
+                    macros: { "Proteínas": 25, "Carboidratos": 45, "Gorduras": 30 },
+                    imagePlaceholder: "🧀"
+                },
+                lanche_gelatina_frutas: {
+                    id: 'lanche_gelatina_frutas', categoryKey: 'lanche', categoryName: "Lanche", title: 'Gelatina Diet com Frutas Picadas',
+                    explanation: 'Leve, refrescante e com pouquíssimas calorias. Uma ótima opção para quando bate a vontade de um doce ou para um lanche leve.',
+                    ingredients: ["1 pacote de gelatina diet do seu sabor preferido (morango, limão, abacaxi, etc.)", "250ml de água fervente", "250ml de água fria", "1 xícara de frutas frescas picadas (ex: morangos, uvas sem semente cortadas ao meio, kiwi em cubos, pedaços de manga). Evite abacaxi fresco, pois pode impedir a gelatina de firmar."],
+                    steps: [
+                        "Em uma tigela resistente ao calor, dissolva completamente o conteúdo do pacote de gelatina diet nos 250ml de água fervente. Mexa bem com uma colher até não haver mais grânulos.",
+                        "Adicione os 250ml de água fria à mistura e mexa novamente para incorporar.",
+                        "Lave e pique as frutas frescas de sua escolha em pedaços pequenos.",
+                        "Distribua as frutas picadas no fundo de taças individuais, potinhos ou em um refratário único.",
+                        "Despeje cuidadosamente a mistura da gelatina líquida sobre as frutas.",
+                        "Leve à geladeira por pelo menos 3-4 horas, ou até que a gelatina esteja completamente firme.",
+                        "Sirva gelada. É uma ótima opção para os dias mais quentes."
+                    ],
+                    macros: { "Proteínas": 5, "Carboidratos": 90, "Gorduras": 5 },
+                    imagePlaceholder: "🍓"
+                },
+
+                // JANTAR (Expandindo todos)
+                jantar_frango_batata_doce: { 
+                    id: 'jantar_frango_batata_doce', categoryKey: 'jantar', categoryName: "Jantar", title: 'Frango com Batata Doce e Brócolis', 
+                    explanation: 'Um clássico da alimentação fitness. O frango é uma fonte magra de proteína. A batata doce é um carboidrato complexo que fornece energia gradual. O brócolis, cozido no vapor para preservar seus nutrientes, é um superalimento carregado de vitaminas e antioxidantes.',
+                    ingredients: ["2 peitos de frango (aproximadamente 200-250g cada)", "Temperos para o frango: 1 dente de alho amassado, suco de 1/2 limão, páprica doce, orégano, sal e pimenta do reino a gosto", "2 batatas doces médias", "1 maço de brócolis (cortado em floretes)", "1 colher de sopa de azeite extra virgem"],
+                    steps: [
+                        "Tempere os peitos de frango: Em uma tigela, coloque os peitos de frango e adicione o alho amassado, suco de limão, páprica doce, orégano, sal e pimenta. Esfregue bem os temperos na carne e deixe marinar por pelo menos 15 minutos (ou mais, na geladeira).",
+                        "Prepare a batata doce: Lave bem as batatas doces. Você pode cozinhá-las com casca ou descascadas. Corte em rodelas grossas ou cubos. Cozinhe em água fervente com uma pitada de sal até ficarem macias, mas ainda firmes (aproximadamente 15-20 minutos). Alternativamente, asse no forno a 200°C por 25-35 minutos, temperadas com azeite, sal e pimenta.",
+                        "Prepare o brócolis: Lave o brócolis e corte em floretes de tamanho uniforme. Cozinhe no vapor por cerca de 5-7 minutos, ou até ficar macio, mas ainda crocante (al dente) e com a cor verde vibrante. Evite cozinhar demais para não perder nutrientes. Se não tiver panela a vapor, pode cozinhar em uma panela com pouca água fervente e tampa por alguns minutos, ou refogar rapidamente.",
+                        "Grelhe o frango: Aqueça o azeite em uma frigideira antiaderente ou grelha em fogo médio-alto. Coloque os peitos de frango marinados e grelhe por cerca de 5-7 minutos de cada lado, ou até estarem cozidos por completo e dourados por fora. O tempo exato dependerá da espessura dos filés. Certifique-se de que não há partes rosadas no interior.",
+                        "Após grelhar, se preferir o frango desfiado (como na receita original do ebook), deixe esfriar um pouco e desfie com dois garfos. Se for servir em filés, apenas fatie ou sirva inteiro.",
+                        "Monte o prato: Em um prato, sirva uma porção do frango grelhado (filé ou desfiado), acompanhado da batata doce cozida ou assada e dos floretes de brócolis no vapor.",
+                        "Regue o brócolis com um fio de azeite, se desejar, e tempere com uma pitada de sal."
+                    ],
+                    macros: { "Proteínas": 50, "Carboidratos": 40, "Gorduras": 10 },
+                    imagePlaceholder: "🍗"
+                },
+                jantar_sopa_abobora: { 
+                    id: 'jantar_sopa_abobora', categoryKey: 'jantar', categoryName: "Jantar", title: 'Sopa Detox de Abóbora com Gengibre', 
+                    explanation: 'Uma sopa cremosa, reconfortante e cheia de nutrientes. A abóbora é rica em vitaminas e fibras, enquanto o gengibre adiciona um toque termogênico e anti-inflamatório. Perfeita para um jantar leve e saudável.',
+                    ingredients: ["500g de abóbora cabotiá ou japonesa descascada e picada em cubos", "1 cebola pequena picada", "2 dentes de alho picados", "1 colher de sopa de azeite extra virgem", "1 pedaço pequeno de gengibre fresco ralado (aproximadamente 2cm, ou a gosto)", "Aproximadamente 500-700ml de água fervente ou caldo de legumes caseiro (o suficiente para cobrir a abóbora)", "Sal e pimenta do reino moída na hora a gosto", "Noz-moscada ralada na hora a gosto (opcional)", "Salsinha fresca picada para finalizar (opcional)"],
+                    steps: [
+                        "Em uma panela média ou grande, aqueça o azeite extra virgem em fogo médio.",
+                        "Adicione a cebola picada e refogue por cerca de 3-5 minutos, até ficar translúcida e macia.",
+                        "Acrescente o alho picado e refogue por mais 1 minuto, mexendo para não queimar.",
+                        "Junte os cubos de abóbora descascada e o gengibre fresco ralado. Refogue por mais 3-5 minutos, mexendo ocasionalmente, para que a abóbora comece a pegar um pouco de cor e sabor.",
+                        "Adicione a água fervente ou o caldo de legumes caseiro, o suficiente para cobrir completamente a abóbora. Tempere com sal e pimenta do reino a gosto.",
+                        "Aumente o fogo até a mistura ferver. Assim que ferver, reduza o fogo para médio-baixo, tampe parcialmente a panela e cozinhe por cerca de 20-25 minutos, ou até que a abóbora esteja bem macia e desmanchando ao ser espetada com um garfo.",
+                        "Com cuidado, transfira a sopa cozida para o copo de um liquidificador. Alternativamente, utilize um mixer de imersão diretamente na panela (desligue o fogo antes).",
+                        "Bata a sopa até obter um creme liso e homogêneo. Se estiver usando liquidificador, tome cuidado com o vapor quente; não encha demais o copo e segure a tampa firmemente com um pano de prato.",
+                        "Volte a sopa cremosa para a panela (se usou liquidificador). Verifique a consistência; se estiver muito grossa, adicione um pouco mais de água quente ou caldo até atingir a textura desejada.",
+                        "Reaqueça a sopa em fogo baixo, se necessário. Prove e ajuste o sal e a pimenta. Adicione uma pitada de noz-moscada ralada na hora, se desejar.",
+                        "Sirva a sopa quente em cumbucas ou pratos fundos, finalizada com salsinha fresca picada por cima para dar cor e frescor."
+                    ],
+                    macros: { "Proteínas": 10, "Carboidratos": 75, "Gorduras": 15 },
+                    imagePlaceholder: "🎃"
+                },
+                jantar_salmao_aspargos: {
+                    id: 'jantar_salmao_aspargos', categoryKey: 'jantar', categoryName: "Jantar", title: 'Salmão Assado com Aspargos',
+                    explanation: 'Uma refeição elegante, leve e rica em ômega-3 e fibras. Simples de preparar e muito saborosa.',
+                    ingredients: ["1 filé de salmão (aproximadamente 150-200g)", "1 maço pequeno de aspargos frescos (cerca de 150-200g)", "1 colher de sopa de azeite extra virgem", "Suco de 1/4 de limão", "Sal e pimenta do reino moída na hora a gosto", "Endro (dill) fresco ou seco a gosto (opcional)", "Rodelas finas de limão para decorar (opcional)"],
+                    steps: [
+                        "Preaqueça o forno a 200°C.",
+                        "Lave os aspargos frescos. Segure cada aspargo pelas extremidades e dobre suavemente; ele se quebrará naturalmente na parte mais fibrosa e dura do talo, que deve ser descartada. Se preferir, corte a base mais dura com uma faca.",
+                        "Em uma tigela, tempere os aspargos com metade do azeite (1/2 colher de sopa), sal e pimenta do reino. Misture para envolvê-los bem no tempero.",
+                        "Disponha os aspargos temperados em uma assadeira antiaderente ou forrada com papel manteiga, formando uma camada única.",
+                        "Seque o filé de salmão com papel toalha. Tempere ambos os lados com sal, pimenta do reino, o suco de limão e o endro (dill), se estiver usando.",
+                        "Regue o salmão com o restante do azeite (1/2 colher de sopa).",
+                        "Coloque o filé de salmão na mesma assadeira, ao lado ou sobre uma parte dos aspargos. Se desejar, coloque algumas rodelas finas de limão sobre o salmão.",
+                        "Leve a assadeira ao forno pré-aquecido e asse por cerca de 12-15 minutos. O tempo de cozimento pode variar dependendo da espessura do filé de salmão e do ponto desejado. O salmão estará pronto quando sua carne estiver opaca e se desfazendo facilmente com um garfo, e os aspargos estiverem macios, mas ainda levemente crocantes.",
+                        "Retire do forno com cuidado.",
+                        "Sirva imediatamente o salmão assado com os aspargos. Pode ser acompanhado de uma porção de quinoa ou arroz integral, se desejar uma refeição mais completa."
+                    ],
+                    macros: { "Proteínas": 45, "Carboidratos": 20, "Gorduras": 35 },
+                    imagePlaceholder: "🎣"
+                },
+                jantar_escondidinho_mandioca: {
+                    id: 'jantar_escondidinho_mandioca', categoryKey: 'jantar', categoryName: "Jantar", title: 'Escondidinho Fit de Mandioca com Carne Magra',
+                    explanation: 'Versão saudável e reconfortante do tradicional escondidinho, utilizando carne magra (patinho moído ou carne seca desfiada) e purê de mandioca (aipim/macaxeira).',
+                    ingredients: ["300g de patinho moído (ou carne seca dessalgada e desfiada)", "500g de mandioca (aipim/macaxeira) cozida", "1/2 cebola média picada", "2 dentes de alho picados", "1 tomate pequeno picado (sem sementes)", "Cheiro verde picado a gosto (salsinha e cebolinha)", "1 colher de sopa de azeite", "Sal e pimenta do reino a gosto", "Para o purê: 1 colher de sopa de manteiga ghee ou azeite, leite desnatado ou vegetal (o suficiente para dar ponto, aprox. 2-3 colheres de sopa)", "Opcional para gratinar: 2 colheres de sopa de queijo parmesão ralado light"],
+                    steps: [
+                        "Prepare o recheio de carne: Se estiver usando carne seca, certifique-se de que esteja bem dessalgada, cozida e desfiada. Se for patinho moído, aqueça o azeite em uma panela e refogue a carne até perder a cor rosada. Adicione a cebola picada e o alho picado, refogando até dourarem.",
+                        "Acrescente o tomate picado ao refogado de carne e cozinhe por alguns minutos até desmanchar um pouco. Tempere com sal, pimenta do reino e o cheiro verde picado. Reserve.",
+                        "Prepare o purê de mandioca: Com a mandioca já cozida e ainda morna, amasse-a bem com um garfo ou espremedor de batatas até obter um purê. Se houver fibras centrais duras, remova-as.",
+                        "Em uma panela, adicione a mandioca amassada, a manteiga ghee (ou azeite) e um pouco de leite. Leve ao fogo baixo, mexendo vigorosamente para incorporar e deixar o purê cremoso e homogêneo. Adicione mais leite aos poucos, se necessário, até atingir a consistência desejada. Tempere com sal a gosto.",
+                        "Montagem do escondidinho: Preaqueça o forno a 180-200°C (se for gratinar).",
+                        "Em um refratário médio (que possa ir ao forno), espalhe todo o recheio de carne moída (ou carne seca) no fundo, formando uma camada uniforme.",
+                        "Cubra a camada de carne com o purê de mandioca, espalhando delicadamente com as costas de uma colher para nivelar.",
+                        "Se for gratinar, polvilhe o queijo parmesão ralado light por cima do purê.",
+                        "Leve ao forno pré-aquecido por cerca de 15-20 minutos, apenas para aquecer bem e, se estiver usando queijo, para gratinar e dourar.",
+                        "Retire do forno, deixe amornar por alguns minutos e sirva."
+                    ],
+                    macros: { "Proteínas": 35, "Carboidratos": 45, "Gorduras": 20 },
+                    imagePlaceholder: "🥔"
+                },
+                jantar_quibe_abobora: {
+                    id: 'jantar_quibe_abobora', categoryKey: 'jantar', categoryName: "Jantar", title: 'Quibe Assado de Abóbora (Vegetariano)',
+                    explanation: 'Uma opção vegetariana deliciosa e nutritiva para o jantar. O quibe de abóbora é rico em fibras, vitaminas e tem um sabor levemente adocicado e aromático.',
+                    ingredients: ["500g de abóbora japonesa (cabotiá) cozida e amassada (bem escorrida)", "1 xícara de trigo para quibe", "1 e 1/2 xícara de água quente para hidratar o trigo", "1/2 cebola média bem picada", "2 dentes de alho amassados", "1/4 xícara de hortelã fresca picada", "1/4 xícara de salsinha fresca picada", "1 colher de chá de pimenta síria (ou uma mistura de canela, cominho e pimenta do reino)", "Sal a gosto", "2-3 colheres de sopa de azeite extra virgem"],
+                    steps: [
+                        "Hidrate o trigo para quibe: Coloque o trigo em uma tigela e cubra com a água quente. Deixe descansar por cerca de 30 minutos a 1 hora, ou até que o trigo absorva toda a água e esteja macio. Escorra bem em uma peneira fina, apertando para retirar todo o excesso de líquido.",
+                        "Prepare a abóbora: Cozinhe a abóbora (no vapor, forno ou água) até ficar bem macia. Amasse com um garfo até obter um purê. É importante que o purê esteja o mais seco possível; se cozinhou em água, deixe escorrer bem em uma peneira.",
+                        "Em uma tigela grande, misture o trigo para quibe hidratado e espremido com o purê de abóbora.",
+                        "Adicione a cebola picada, o alho amassado, a hortelã picada e a salsinha picada. Misture bem.",
+                        "Tempere a massa com a pimenta síria, sal a gosto e 1 colher de sopa de azeite. Misture tudo muito bem com as mãos (como se estivesse sovando levemente) para que todos os ingredientes e temperos se incorporem de forma homogênea.",
+                        "Preaqueça o forno a 200°C.",
+                        "Unte um refratário médio (aproximadamente 20x30cm) com 1 colher de sopa de azeite.",
+                        "Espalhe a massa do quibe de abóbora no refratário, pressionando levemente para nivelar. A espessura ideal é de cerca de 2-3 cm.",
+                        "Com uma faca, faça cortes na superfície do quibe, formando losangos ou quadrados. Isso ajuda a cozinhar por igual e dá um visual bonito.",
+                        "Regue a superfície do quibe com o restante do azeite (1 colher de sopa).",
+                        "Leve ao forno pré-aquecido por cerca de 30-40 minutos, ou até que o quibe esteja firme e dourado por cima e nas bordas.",
+                        "Retire do forno, deixe amornar um pouco e sirva. Pode ser acompanhado de coalhada seca, salada ou molho tahine."
+                    ],
+                    macros: { "Proteínas": 15, "Carboidratos": 65, "Gorduras": 20 },
+                    imagePlaceholder: "🧡"
+                },
+                jantar_pizza_couveflor: {
+                    id: 'jantar_pizza_couveflor', categoryKey: 'jantar', categoryName: "Jantar", title: 'Pizza Fit com Massa de Couve-Flor',
+                    explanation: 'Uma alternativa low-carb, sem glúten e deliciosa para os amantes de pizza. A massa de couve-flor fica surpreendentemente saborosa e crocante.',
+                    ingredients: ["1 cabeça média de couve-flor (aproximadamente 500g)", "1 ovo grande", "1/2 xícara de queijo muçarela ralado light (ou parmesão ralado)", "1 colher de chá de orégano seco", "Sal e pimenta do reino a gosto", "Para a cobertura: 3-4 colheres de sopa de molho de tomate caseiro (sem açúcar)", "Recheios a gosto: frango desfiado, atum, cogumelos, tomate cereja, rúcula fresca (para colocar depois de assar), manjericão fresco, azeitonas."],
+                    steps: [
+                        "Preaqueça o forno a 220°C. Forre uma assadeira grande com papel manteiga.",
+                        "Prepare a massa de couve-flor: Lave a couve-flor e corte em floretes menores. Processe os floretes em um processador de alimentos até obter uma textura similar a arroz ou farinha grossa. Não processe demais para não virar purê.",
+                        "Cozinhe a couve-flor processada: Você pode cozinhar no vapor por cerca de 5-7 minutos ou no micro-ondas por 4-5 minutos em potência alta, até amolecer. O objetivo é apenas amaciá-la.",
+                        "Deixe a couve-flor cozida esfriar um pouco. Em seguida, transfira para um pano de prato limpo e seco (ou um voal/tecido fino). Torça bem o pano para espremer o máximo de líquido possível da couve-flor. Esta etapa é crucial para uma massa crocante.",
+                        "Em uma tigela grande, coloque a couve-flor espremida. Adicione o ovo, o queijo muçarela ralado (ou parmesão), o orégano, sal e pimenta do reino. Misture tudo muito bem com as mãos ou uma colher até formar uma massa homogênea.",
+                        "Transfira a massa para a assadeira preparada com papel manteiga. Com as mãos (pode umedecê-las levemente), espalhe e pressione a massa formando um disco de pizza com cerca de 0,5 cm de espessura. Faça uma borda um pouco mais alta, se desejar.",
+                        "Leve a massa de pizza de couve-flor ao forno pré-aquecido e asse por cerca de 15-20 minutos, ou até que esteja firme e dourada nas bordas.",
+                        "Retire a massa pré-assada do forno. Espalhe cuidadosamente o molho de tomate sobre a superfície.",
+                        "Distribua os recheios de sua preferência (exceto folhas frescas como rúcula e manjericão, que são adicionadas no final).",
+                        "Volte a pizza ao forno por mais 5-10 minutos, ou até que os recheios estejam aquecidos e o queijo (se usar mais na cobertura) derretido e borbulhante.",
+                        "Retire do forno. Se for usar rúcula ou manjericão fresco, adicione por cima agora.",
+                        "Corte em fatias e sirva imediatamente."
+                    ],
+                    macros: { "Proteínas": 30, "Carboidratos": 30, "Gorduras": 40 },
+                    imagePlaceholder: "🍕"
+                },
+                 jantar_charuto_repolho: {
+                    id: 'jantar_charuto_repolho', categoryKey: 'jantar', categoryName: "Jantar", title: 'Charuto de Repolho Fit com Carne Magra',
+                    explanation: 'Leve, saboroso e uma ótima forma de consumir vegetais e proteína de forma criativa. Uma refeição completa e reconfortante.',
+                    ingredients: ["8-10 folhas grandes de repolho verde (ou roxo)", "300g de patinho moído (ou outra carne magra moída)", "1/2 xícara de arroz integral cru (ou quinoa crua)", "1 cebola pequena picada", "2 dentes de alho picados", "1 tomate pequeno picado, sem sementes", "1/4 xícara de hortelã fresca picada", "1/4 xícara de salsinha fresca picada", "Sal e pimenta do reino a gosto", "Para o molho: 1 lata (400g) de tomate pelado em cubos (ou molho de tomate caseiro), 1 xícara de água ou caldo de legumes, 1 folha de louro"],
+                    steps: [
+                        "Prepare as folhas de repolho: Lave bem as folhas. Em uma panela grande com água fervente e uma pitada de sal, mergulhe as folhas de repolho por 2-3 minutos, ou até que fiquem maleáveis, mas não cozidas demais. Retire com uma escumadeira e mergulhe em água fria para interromper o cozimento. Escorra e reserve. Com uma faca, retire cuidadosamente a parte mais grossa do talo central de cada folha para facilitar na hora de enrolar.",
+                        "Prepare o recheio: Em uma tigela, misture a carne moída crua, o arroz integral cru (lavado), a cebola picada, o alho picado, o tomate picado, a hortelã e a salsinha. Tempere com sal e pimenta do reino a gosto. Misture tudo muito bem com as mãos para incorporar todos os ingredientes.",
+                        "Montagem dos charutos: Abra uma folha de repolho escaldada sobre uma superfície limpa. Coloque uma porção do recheio (cerca de 2-3 colheres de sopa) na base da folha (perto de onde era o talo). Dobre as laterais da folha sobre o recheio e enrole firmemente, como um rolinho primavera, formando o charuto.",
+                        "Repita o processo com todas as folhas e o restante do recheio.",
+                        "Cozinhe os charutos: Em uma panela grande e larga (que comporte os charutos em uma ou duas camadas), espalhe um pouco do tomate pelado (ou molho) no fundo. Isso evita que os charutos grudem.",
+                        "Acomode os charutos na panela, com a dobra para baixo, bem juntinhos para não abrirem durante o cozimento.",
+                        "Despeje o restante do tomate pelado (ou molho) sobre os charutos. Adicione a água (ou caldo de legumes) e a folha de louro. O líquido deve quase cobrir os charutos.",
+                        "Tempere o molho com uma pitada de sal e pimenta, se necessário.",
+                        "Leve a panela ao fogo médio. Assim que ferver, reduza o fogo para baixo, tampe a panela e cozinhe por cerca de 40-50 minutos, ou até que o repolho esteja bem macio e o arroz cozido. Verifique ocasionalmente se precisa de mais líquido, adicionando um pouco de água quente se necessário.",
+                        "Retire os charutos com cuidado da panela e sirva quentes, regados com o molho do cozimento. Pode acompanhar com iogurte natural ou coalhada."
+                    ],
+                    macros: { "Proteínas": 35, "Carboidratos": 40, "Gorduras": 25 },
+                    imagePlaceholder: "🥬"
+                },
+
+                // SOBREMESA (Expandindo todos)
+                sobremesa_mousse: { 
+                    id: 'sobremesa_mousse', categoryKey: 'sobremesa', categoryName: "Sobremesa Fit", title: 'Mousse de Maracujá Proteico', 
+                    explanation: 'Uma sobremesa leve, refrescante e rica em proteínas, perfeita para satisfazer a vontade de um doce sem culpa. O maracujá adiciona um sabor cítrico delicioso e é conhecido por suas propriedades calmantes.',
+                    ingredients: ["1 xícara (200g) de iogurte natural desnatado ou iogurte grego natural sem açúcar", "1/2 xícara de polpa de maracujá fresca (com ou sem sementes, a gosto)", "2 scoops (aproximadamente 60g) de whey protein sabor baunilha ou neutro", "Adoçante a gosto (stevia, xilitol, eritritol - líquido ou em pó)", "Opcional para decorar: folhas de hortelã fresca, sementes de maracujá extras, raspas de limão"],
+                    steps: [
+                        "No copo do liquidificador, adicione o iogurte natural (ou grego), a polpa de maracujá e os scoops de whey protein.",
+                        "Bata em velocidade média-alta por cerca de 1-2 minutos, ou até obter uma mistura completamente homogênea, cremosa e sem grumos de whey protein.",
+                        "Prove a mistura. Se necessário, adicione o adoçante de sua preferência a gosto. Comece com uma pequena quantidade e vá ajustando, batendo novamente no liquidificador por alguns segundos para incorporar bem o adoçante.",
+                        "Distribua a mousse em taças individuais (rende cerca de 2-3 porções) ou em um recipiente único.",
+                        "Leve à geladeira por pelo menos 2 horas para firmar bem e gelar. Quanto mais tempo na geladeira, mais firme ficará a consistência.",
+                        "Antes de servir, decore com folhas de hortelã fresca, algumas sementes de maracujá extras ou raspas de limão para um toque especial, se desejar.",
+                        "Sirva gelado."
+                    ],
+                    macros: { "Proteínas": 45, "Carboidratos": 35, "Gorduras": 20 },
+                    imagePlaceholder: "🍮"
+                },
+                sobremesa_espetinho: { 
+                    id: 'sobremesa_espetinho', categoryKey: 'sobremesa', categoryName: "Sobremesa Fit", title: 'Espetinhos de Frutas com Calda de Chocolate Amargo', 
+                    explanation: 'Uma sobremesa colorida, refrescante e naturalmente doce. Os espetinhos de frutas são uma forma divertida de consumir vitaminas e fibras, e a calda de chocolate amargo adiciona um toque especial sem exagerar no açúcar.',
+                    ingredients: ["Seleção de frutas frescas variadas, picadas em cubos ou pedaços de tamanho similar (ex: morangos inteiros ou cortados ao meio, uvas sem semente, cubos de kiwi, manga, abacaxi, banana em rodelas grossas)", "Palitos de churrasco pequenos ou espetos de bambu", "Para a calda: 50g de chocolate amargo (mínimo 70% cacau), 1 colher de chá de óleo de coco (opcional, para dar brilho e fluidez à calda)"],
+                    steps: [
+                        "Lave bem todas as frutas. Se necessário, descasque (como kiwi, manga, banana). Pique as frutas em pedaços que possam ser facilmente espetados e consumidos em uma mordida.",
+                        "Monte os espetinhos: Vá alternando os diferentes tipos de frutas nos palitos, criando combinações coloridas e atraentes. Deixe um pequeno espaço nas extremidades dos palitos.",
+                        "Disponha os espetinhos montados em um prato ou travessa.",
+                        "Prepare a calda de chocolate: Pique o chocolate amargo em pedaços pequenos para facilitar o derretimento.",
+                        "Derreta o chocolate em banho-maria (coloque os pedaços de chocolate em uma tigela refratária sobre uma panela com água fervente, sem que a tigela toque na água, mexendo até derreter) ou no micro-ondas (em potência média, em intervalos de 20-30 segundos, mexendo a cada intervalo até estar completamente derretido e liso).",
+                        "Se for usar o óleo de coco, adicione-o ao chocolate derretido e misture bem para incorporar. Isso ajudará a calda a ficar mais fluida e brilhante.",
+                        "Com uma colher, regue os espetinhos de frutas com a calda de chocolate derretido, fazendo movimentos de zigue-zague. Alternativamente, sirva a calda de chocolate em uma pequena tigela à parte para que cada um mergulhe seus espetinhos.",
+                        "Se desejar que a calda de chocolate endureça um pouco sobre as frutas, leve os espetinhos à geladeira por cerca de 10-15 minutos antes de servir.",
+                        "Sirva os espetinhos de frutas como uma sobremesa leve e saudável."
+                    ],
+                    macros: { "Proteínas": 5, "Carboidratos": 70, "Gorduras": 25 },
+                    imagePlaceholder: "🍡"
+                },
+                sobremesa_picole_frutas: {
+                    id: 'sobremesa_picole_frutas', categoryKey: 'sobremesa', categoryName: "Sobremesa Fit", title: 'Picolé de Frutas Caseiro (Natural)',
+                    explanation: 'Refrescante, 100% natural e sem adição de açúcar refinado. Uma ótima maneira de aproveitar as frutas e se refrescar nos dias quentes.',
+                    ingredients: ["2 xícaras de frutas frescas ou congeladas de sua preferência, picadas (ex: morangos, mangas, abacaxi, kiwi, melancia, frutas vermelhas)", "1/2 a 1 xícara de líquido base (água de coco, iogurte natural desnatado, suco de laranja natural ou água filtrada)", "Adoçante natural a gosto (opcional, ex: mel, stevia, eritritol - se as frutas não estiverem muito doces)", "Opcional: folhas de hortelã, raspas de limão, pedacinhos de fruta inteiros para adicionar textura"],
+                    steps: [
+                        "Lave bem as frutas frescas. Se estiver usando frutas congeladas, não precisa descongelar.",
+                        "No copo do liquidificador, adicione as frutas picadas e o líquido base escolhido (comece com 1/2 xícara e adicione mais se necessário para ajudar a bater).",
+                        "Se for usar adoçante ou outros ingredientes opcionais (hortelã, raspas de limão), adicione-os agora.",
+                        "Bata tudo em velocidade alta até obter uma mistura homogênea e cremosa. Se necessário, pare e raspe as laterais do liquidificador.",
+                        "Prove a mistura e ajuste a doçura, se necessário.",
+                        "Se quiser picolés com pedacinhos de fruta, adicione alguns pedaços pequenos de fruta inteira à mistura batida e mexa delicadamente com uma colher.",
+                        "Despeje a mistura cuidadosamente nas forminhas de picolé, deixando um pequeno espaço no topo para expansão ao congelar.",
+                        "Insira os palitos de picolé nas forminhas.",
+                        "Leve as forminhas ao freezer por pelo menos 4-6 horas, ou até que os picolés estejam completamente congelados e firmes.",
+                        "Para desenformar, passe rapidamente a parte externa da forminha em água morna por alguns segundos, ou deixe em temperatura ambiente por 1-2 minutos. Puxe o palito com cuidado.",
+                        "Sirva imediatamente."
+                    ],
+                    macros: { "Proteínas": 5, "Carboidratos": 90, "Gorduras": 5 },
+                    imagePlaceholder: "🍦"
+                },
+                sobremesa_maca_assada: {
+                    id: 'sobremesa_maca_assada', categoryKey: 'sobremesa', categoryName: "Sobremesa Fit", title: 'Maçã Assada com Canela e Nozes',
+                    explanation: 'Uma sobremesa quente, aromática, naturalmente doce e reconfortante. Perfeita para os dias mais frios ou quando bate a vontade de um doce saudável.',
+                    ingredients: ["1 maçã grande (tipo Fuji, Gala ou a de sua preferência)", "1 colher de chá de canela em pó", "1 colher de sopa de nozes picadas (ou amêndoas, castanhas)", "Opcional: 1 colher de chá de uvas passas, 1 colher de chá de mel ou xarope de bordo (maple syrup) para um toque extra de doçura, uma pitada de noz-moscada"],
+                    steps: [
+                        "Preaqueça o forno a 180°C.",
+                        "Lave bem a maçã. Com uma faca pequena e afiada ou um descaroçador de maçãs, retire o miolo (caroço e sementes) da maçã pela parte de cima, formando uma cavidade no centro. Tenha cuidado para não perfurar a base da maçã.",
+                        "Em uma tigela pequena, misture a canela em pó, as nozes picadas e os ingredientes opcionais (uvas passas, noz-moscada).",
+                        "Recheie a cavidade da maçã com essa mistura de canela e nozes, pressionando levemente.",
+                        "Se for usar mel ou xarope de bordo, regue um pouco por cima do recheio e da maçã.",
+                        "Coloque a maçã recheada em uma assadeira pequena ou refratário individual que possa ir ao forno. Adicione uma ou duas colheres de sopa de água no fundo da assadeira para criar vapor e evitar que a maçã queime por baixo.",
+                        "Leve ao forno pré-aquecido e asse por cerca de 30-40 minutos. O tempo de cozimento pode variar dependendo do tamanho e tipo da maçã. A maçã estará pronta quando estiver macia ao ser espetada com um garfo e a casca levemente enrugada.",
+                        "Retire do forno com cuidado.",
+                        "Sirva a maçã assada quente, pura ou acompanhada de uma colher de iogurte grego natural ou uma pequena bola de sorvete de creme fit (se desejar uma sobremesa mais elaborada)."
+                    ],
+                    macros: { "Proteínas": 2, "Carboidratos": 90, "Gorduras": 8 },
+                    imagePlaceholder: "🍎"
+                },
+                sobremesa_brownie_batata_doce: {
+                    id: 'sobremesa_brownie_batata_doce', categoryKey: 'sobremesa', categoryName: "Sobremesa Fit", title: 'Brownie Fit de Batata Doce e Cacau',
+                    explanation: 'Surpreendentemente delicioso, úmido e mais saudável que o brownie tradicional, utilizando batata doce como base e cacau em pó.',
+                    ingredients: ["1 xícara (aproximadamente 200g) de purê de batata doce cozida e amassada (bem sequinho)", "1/2 xícara de cacau em pó 100% (sem açúcar)", "2 ovos grandes", "1/4 xícara de mel, xarope de bordo (maple syrup) ou adoçante culinário a gosto (ajuste conforme a doçura desejada)", "2 colheres de sopa de óleo de coco derretido (ou outra gordura saudável)", "1 colher de chá de extrato de baunilha", "1/2 colher de chá de fermento em pó", "1 pitada de sal", "Opcional: 1/4 xícara de nozes picadas ou gotas de chocolate amargo (mínimo 70% cacau)"],
+                    steps: [
+                        "Preaqueça o forno a 180°C. Unte e enfarinhe (com cacau em pó ou farinha de aveia) uma forma quadrada pequena (aproximadamente 20x20cm) ou forre com papel manteiga.",
+                        "Certifique-se de que o purê de batata doce esteja bem amassado e sem pedaços. Se cozinhou a batata doce com casca, retire-a. O purê deve estar mais para seco do que aguado.",
+                        "Em uma tigela grande, misture o purê de batata doce, os ovos, o mel (ou adoçante), o óleo de coco derretido e o extrato de baunilha. Bata bem com um garfo ou batedor de arame (fouet) até obter uma mistura homogênea.",
+                        "Em uma tigela separada, peneire o cacau em pó, o fermento em pó e a pitada de sal. Misture os ingredientes secos.",
+                        "Adicione gradualmente os ingredientes secos à mistura úmida de batata doce, mexendo com uma espátula apenas até incorporar. Não misture em excesso.",
+                        "Se for usar nozes picadas ou gotas de chocolate amargo, adicione-as à massa agora e misture delicadamente.",
+                        "Despeje a massa do brownie na forma preparada, espalhando uniformemente com a espátula.",
+                        "Leve ao forno pré-aquecido e asse por cerca de 20-25 minutos. O brownie estará pronto quando as bordas estiverem firmes e um palito inserido no centro sair com algumas migalhas úmidas (não totalmente seco, para manter a umidade).",
+                        "Retire do forno e deixe o brownie esfriar completamente na forma antes de cortar em quadrados.",
+                        "Sirva puro ou acompanhado de frutas vermelhas. Guarde em recipiente hermético."
+                    ],
+                    macros: { "Proteínas": 15, "Carboidratos": 60, "Gorduras": 25 },
+                    imagePlaceholder: "🍫"
+                },
+                sobremesa_pudim_chia: {
+                    id: 'sobremesa_pudim_chia', categoryKey: 'sobremesa', categoryName: "Sobremesa Fit", title: 'Pudim de Chia Cremoso com Calda de Manga',
+                    explanation: 'Um pudim cremoso, rico em fibras, ômega-3 e antioxidantes. A chia forma um gel que dá a textura de pudim, e a manga adiciona doçura natural e vitaminas.',
+                    ingredients: ["Para o pudim de chia: 3 colheres de sopa de sementes de chia", "1 xícara (240ml) de leite de coco light (ou outro leite vegetal como amêndoas, aveia)", "1 colher de chá de extrato de baunilha (opcional)", "Adoçante a gosto (mel, xarope de bordo, stevia - opcional, ajuste conforme a doçura do leite e da fruta)", "Para a calda de manga: Polpa de 1/2 manga madura (tipo Palmer ou Tommy), algumas gotas de suco de limão (opcional, para realçar o sabor)"],
+                    steps: [
+                        "Prepare o pudim de chia: Em um pote de vidro com tampa ou uma tigela, misture as sementes de chia com o leite de coco (ou outro leite vegetal).",
+                        "Adicione o extrato de baunilha (se usar) e o adoçante (se usar). Misture muito bem com uma colher ou um pequeno batedor de arame para garantir que as sementes de chia fiquem bem distribuídas e não formem grumos.",
+                        "Deixe a mistura descansar por cerca de 5-10 minutos em temperatura ambiente e depois mexa novamente vigorosamente. Isso ajuda a evitar que as sementes se acumulem no fundo.",
+                        "Cubra o recipiente e leve à geladeira por pelo menos 4 horas, ou idealmente, durante a noite, para que as sementes de chia absorvam o líquido e formem um gel espesso, com consistência de pudim.",
+                        "Prepare a calda de manga: Descasque a manga e corte a polpa em pedaços. Bata a polpa de manga no liquidificador ou processador até obter um purê liso. Se desejar, adicione algumas gotas de suco de limão para realçar o sabor e evitar a oxidação.",
+                        "Montagem: Após o pudim de chia ter firmado, retire-o da geladeira. Mexa-o suavemente.",
+                        "Distribua o pudim de chia em taças ou potinhos individuais.",
+                        "Cubra cada porção do pudim com uma generosa camada da calda (purê) de manga.",
+                        "Opcional: Decore com pedacinhos de manga fresca, coco ralado sem açúcar ou folhas de hortelã.",
+                        "Sirva gelado. Pode ser guardado na geladeira por até 3-4 dias."
+                    ],
+                    macros: { "Proteínas": 10, "Carboidratos": 50, "Gorduras": 40 },
+                    imagePlaceholder: "🥭"
+                },
+                sobremesa_creme_abacate_cacau: {
+                    id: 'sobremesa_creme_abacate_cacau', categoryKey: 'sobremesa', categoryName: "Sobremesa Fit", title: 'Creme de Abacate com Cacau (Mousse de Chocolate Fit)',
+                    explanation: 'Uma "mousse" de chocolate incrivelmente cremosa, saudável e vegana, feita com abacate e cacau. Rica em gorduras boas, fibras e antioxidantes.',
+                    ingredients: ["1 abacate maduro pequeno (aproximadamente 150-200g de polpa)", "2 a 3 colheres de sopa de cacau em pó 100% (sem açúcar, ajuste conforme a intensidade de chocolate desejada)", "2 a 3 colheres de sopa de adoçante líquido (mel, xarope de bordo, agave) ou adoçante em pó a gosto (stevia, xilitol)", "1 colher de chá de extrato de baunilha (opcional)", "1 pitada de sal (para realçar o sabor do chocolate)", "2 a 4 colheres de sopa de leite vegetal (amêndoas, coco, aveia) ou água, apenas se necessário para ajudar a bater e atingir a consistência desejada"],
+                    steps: [
+                        "Corte o abacate ao meio, retire o caroço e, com uma colher, retire toda a polpa. Certifique-se de que o abacate esteja bem maduro, mas sem partes escuras ou estragadas.",
+                        "Coloque a polpa do abacate no copo de um processador de alimentos ou liquidificador potente.",
+                        "Adicione o cacau em pó, o adoçante escolhido, o extrato de baunilha (se usar) e a pitada de sal.",
+                        "Comece a processar ou bater em velocidade média-alta. Pare e raspe as laterais do recipiente algumas vezes para garantir que todos os ingredientes sejam bem incorporados.",
+                        "Continue processando até obter um creme completamente liso, homogêneo e aveludado, sem pedaços de abacate. Isso pode levar alguns minutos.",
+                        "Verifique a consistência. Se o creme estiver muito espesso e difícil de bater, adicione o leite vegetal (ou água) aos poucos (1 colher de sopa por vez), batendo entre as adições, até atingir a cremosidade de mousse desejada.",
+                        "Prove o creme e ajuste a quantidade de cacau ou adoçante, se necessário, para o seu paladar.",
+                        "Transfira o creme de abacate com cacau para taças individuais ou um recipiente único.",
+                        "Leve à geladeira por pelo menos 30 minutos a 1 hora para firmar um pouco mais e gelar. Quanto mais tempo na geladeira, mais firme ficará.",
+                        "Sirva gelado. Opcionalmente, decore com raspas de chocolate amargo, frutas vermelhas frescas ou nibs de cacau."
+                    ],
+                    macros: { "Proteínas": 8, "Carboidratos": 42, "Gorduras": 50 },
+                    imagePlaceholder: "🥑"
+                },
+
+                // BEBIDA (Expandindo todos)
+                bebida_suco_verde: { 
+                    id: 'bebida_suco_verde', categoryKey: 'bebida', categoryName: "Bebida Energética", title: 'Suco Verde Detox Power', 
+                    explanation: 'Este suco verde é uma bomba de nutrientes, ideal para começar o dia com energia, auxiliar na desintoxicação do organismo e fortalecer o sistema imunológico. A combinação de folhas verdes, frutas e gengibre oferece vitaminas, minerais e antioxidantes.',
+                    ingredients: ["2 folhas de couve manteiga (grandes, bem lavadas e sem o talo central mais grosso)", "1 maçã verde pequena (com casca, se for orgânica, e sem sementes)", "Suco de 1/2 limão espremido na hora", "1 rodela pequena de gengibre fresco (aproximadamente 1-2 cm, descascado)", "150ml de água de coco natural gelada (ou água filtrada gelada)", "Opcional: algumas folhas de hortelã fresca, 1 colher de chá de semente de chia (hidratada previamente em um pouco de água por 10 min)"],
+                    steps: [
+                        "Lave muito bem todos os ingredientes frescos (couve, maçã, gengibre, hortelã, se usar) em água corrente.",
+                        "Retire o talo central mais grosso das folhas de couve, pois pode ser fibroso e amargo. Rasgue as folhas em pedaços menores.",
+                        "Corte a maçã verde em quatro partes, retire o miolo com as sementes. Pique em pedaços menores para facilitar a liquidificação.",
+                        "Descasque a rodela de gengibre.",
+                        "No copo do liquidificador, adicione as folhas de couve rasgadas, os pedaços de maçã, o suco de limão espremido na hora, o gengibre descascado e a água de coco (ou água filtrada) gelada.",
+                        "Se for utilizar folhas de hortelã ou a chia hidratada, adicione-as também ao liquidificador.",
+                        "Tampe o liquidificador e bata em velocidade alta por aproximadamente 1 a 2 minutos, ou até que a mistura esteja completamente lisa, homogênea e sem pedaços visíveis de folhas ou frutas. Se necessário, pare e empurre os ingredientes para baixo com uma espátula (com o liquidificador desligado).",
+                        "Verifique a consistência. Se o suco estiver muito espesso para o seu gosto, adicione um pouco mais de água de coco ou água filtrada e bata rapidamente para incorporar.",
+                        "Despeje o suco verde em um copo grande.",
+                        "Sirva imediatamente para aproveitar ao máximo os nutrientes e o frescor. Geralmente, não é recomendado coar para manter todas as fibras, mas se preferir uma textura mais líquida, pode coar em uma peneira fina ou voal."
+                    ],
+                    macros: { "Proteínas": 5, "Carboidratos": 85, "Gorduras": 10 },
+                    imagePlaceholder: "🥤"
+                },
+                bebida_agua_saborizada: { 
+                    id: 'bebida_agua_saborizada', categoryKey: 'bebida', categoryName: "Bebida Refrescante", title: 'Água Aromatizada Refrescante (Hidratação Saborosa)', 
+                    explanation: 'Uma forma deliciosa, natural e saudável de se manter hidratado ao longo do dia. A água aromatizada é praticamente isenta de calorias e pode ser personalizada com suas frutas, vegetais e ervas favoritas, adicionando um toque de sabor e frescor.',
+                    ingredients: ["1 litro de água filtrada ou mineral gelada", "1/2 limão siciliano ou tahiti, bem lavado e cortado em rodelas finas", "3-4 rodelas finas de gengibre fresco descascado (opcional, para um toque picante)", "Alguns ramos de hortelã fresca, bem lavados", "Gelo a gosto", "Outras sugestões: rodelas de pepino, morangos fatiados, rodelas de laranja, canela em pau, alecrim fresco."],
+                    steps: [
+                        "Escolha uma jarra de vidro grande ou um recipiente com tampa com capacidade para pelo menos 1 litro.",
+                        "Lave bem todas as frutas, vegetais e ervas que serão utilizadas.",
+                        "Corte o limão em rodelas finas. Se for usar gengibre, descasque e corte também em rodelas finas.",
+                        "Adicione as rodelas de limão, as rodelas de gengibre (se usar) e os ramos de hortelã fresca (pode dar uma leve amassadinha nas folhas de hortelã para liberar mais aroma) na jarra.",
+                        "Despeje o litro de água filtrada ou mineral gelada sobre os ingredientes na jarra.",
+                        "Com uma colher longa, misture levemente os ingredientes na água.",
+                        "Tampe a jarra (ou cubra com filme plástico) e leve à geladeira por pelo menos 30 minutos a 1 hora para que os sabores se infundam na água. Quanto mais tempo na geladeira (até 4-6 horas), mais intenso será o sabor.",
+                        "Na hora de servir, adicione gelo a gosto nos copos.",
+                        "Despeje a água aromatizada nos copos e aproveite. Você pode repor a água na jarra uma ou duas vezes, mantendo as mesmas frutas e ervas, embora o sabor vá diminuindo.",
+                        "Consuma no mesmo dia para melhor frescor e sabor. Descarte as frutas e ervas após o uso."
+                    ],
+                    macros: { "Proteínas": 1, "Carboidratos": 90, "Gorduras": 9 },
+                    imagePlaceholder: "💧"
+                },
+                bebida_cha_hibisco: {
+                    id: 'bebida_cha_hibisco', categoryKey: 'bebida', categoryName: "Bebida Funcional", title: 'Chá Gelado de Hibisco com Gengibre e Limão',
+                    explanation: 'Uma bebida refrescante, com propriedades diuréticas e termogênicas, graças ao hibisco e ao gengibre. O limão adiciona um toque cítrico e vitamina C.',
+                    ingredients: ["1 colher de sopa de flores de hibisco secas", "1 rodela de gengibre fresco (aproximadamente 2cm), fatiada ou ralada", "500ml de água filtrada", "Suco de 1/2 limão espremido na hora (opcional)", "Adoçante natural a gosto (stevia, xilitol, mel - opcional)", "Gelo e rodelas de limão para servir"],
+                    steps: [
+                        "Em uma chaleira ou panela pequena, leve os 500ml de água filtrada para ferver.",
+                        "Assim que a água começar a ferver, adicione as flores de hibisco secas e a rodela de gengibre fatiada (ou ralada).",
+                        "Desligue o fogo imediatamente, tampe a panela e deixe em infusão por cerca de 5 a 10 minutos. Quanto mais tempo em infusão, mais forte e intenso será o sabor e a cor do chá.",
+                        "Após o tempo de infusão, coe o chá utilizando uma peneira fina, descartando as flores de hibisco e o gengibre.",
+                        "Se for adicionar o suco de limão, esprema-o e adicione ao chá coado. Misture.",
+                        "Prove o chá. Se desejar adoçar, adicione o adoçante natural de sua preferência a gosto, mexendo bem para dissolver.",
+                        "Deixe o chá esfriar completamente em temperatura ambiente e, em seguida, leve à geladeira por pelo menos 1-2 horas para gelar bem.",
+                        "Para servir, encha os copos com bastante gelo, despeje o chá gelado de hibisco e decore com rodelas de limão, se desejar.",
+                        "Este chá pode ser armazenado na geladeira por até 2-3 dias."
+                    ],
+                    macros: { "Proteínas": 0, "Carboidratos": 95, "Gorduras": 5 },
+                    imagePlaceholder: "🌺"
+                },
+                bebida_limonada_suica: {
+                    id: 'bebida_limonada_suica', categoryKey: 'bebida', categoryName: "Bebida Refrescante", title: 'Limonada Suíça Fit (Cremosa e Refrescante)',
+                    explanation: 'Uma versão mais saudável da clássica limonada suíça, utilizando adoçante natural e mantendo toda a cremosidade e frescor. Ideal para dias quentes.',
+                    ingredients: ["1 limão tahiti grande, bem lavado", "500ml de água filtrada bem gelada", "Adoçante culinário a gosto (stevia, xilitol, eritritol - em pó ou líquido)", "Cubos de gelo a gosto"],
+                    steps: [
+                        "Lave muito bem o limão tahiti em água corrente, esfregando a casca.",
+                        "Corte as duas extremidades (pontas) do limão e descarte-as.",
+                        "Corte o limão em 4 ou 8 pedaços menores, com casca e tudo.",
+                        "É crucial remover a parte branca central do limão (o miolo fibroso) e todas as sementes visíveis, pois são essas partes que podem deixar a limonada amarga.",
+                        "Coloque os pedaços de limão (com casca, mas sem o miolo branco e sementes) no copo do liquidificador.",
+                        "Adicione a água filtrada bem gelada e o adoçante de sua preferência a gosto. Comece com uma quantidade menor de adoçante e ajuste depois, se necessário.",
+                        "Bata no liquidificador em velocidade alta por um período muito curto, apenas o suficiente para triturar o limão e misturar os ingredientes – geralmente de 10 a 20 segundos no máximo. Bater demais pode liberar o amargor da casca.",
+                        "Coe a limonada imediatamente após bater, utilizando uma peneira fina diretamente sobre uma jarra ou os copos onde será servida. Pressione levemente o bagaço na peneira com uma colher para extrair todo o líquido.",
+                        "Adicione cubos de gelo a gosto nos copos.",
+                        "Sirva a limonada suíça fit imediatamente para aproveitar todo o frescor e evitar que amargue com o tempo.",
+                        "Se sobrar, guarde na geladeira e consuma em poucas horas."
+                    ],
+                    macros: { "Proteínas": 1, "Carboidratos": 90, "Gorduras": 9 },
+                    imagePlaceholder: "🍋"
+                },
+                bebida_vitamina_morango: {
+                    id: 'bebida_vitamina_morango', categoryKey: 'bebida', categoryName: "Bebida Energética", title: 'Vitamina Cremosa de Morango e Banana',
+                    explanation: 'Uma vitamina saborosa, nutritiva e refrescante, ótima para um café da manhã rápido, lanche da tarde ou como um pré ou pós-treino leve.',
+                    ingredients: ["1 xícara de morangos frescos ou congelados (aproximadamente 150g)", "1/2 banana madura (de preferência congelada em rodelas para mais cremosidade)", "200ml de leite de amêndoas sem açúcar (ou outro leite vegetal, ou leite desnatado)", "Opcional: 1 colher de chá de sementes de chia ou linhaça (para mais fibras), 1 colher de sopa de aveia em flocos (para mais sustância), adoçante a gosto (se necessário)"],
+                    steps: [
+                        "Lave bem os morangos frescos, se estiver usando. Retire os cabinhos.",
+                        "Se estiver usando banana fresca, descasque e corte em rodelas. Para uma vitamina mais cremosa e gelada, utilize banana previamente congelada em rodelas.",
+                        "No copo do liquidificador, adicione os morangos (frescos ou congelados) e as rodelas de banana (fresca ou congelada).",
+                        "Acrescente o leite de amêndoas (ou o leite de sua escolha).",
+                        "Se for adicionar sementes de chia/linhaça ou aveia, coloque-os também no liquidificador.",
+                        "Tampe o liquidificador e bata em velocidade alta por cerca de 1-2 minutos, ou até que todos os ingredientes estejam bem triturados e a vitamina esteja lisa, cremosa e homogênea.",
+                        "Prove a vitamina. Se os morangos ou a banana não estiverem muito doces, adicione um pouco de adoçante natural a gosto (mel, stevia) e bata rapidamente para incorporar.",
+                        "Despeje a vitamina em um copo grande.",
+                        "Sirva imediatamente para melhor sabor e aproveitamento dos nutrientes.",
+                        "Se desejar, decore com um morango na borda do copo ou polvilhe um pouco de chia por cima."
+                    ],
+                    macros: { "Proteínas": 10, "Carboidratos": 75, "Gorduras": 15 },
+                    imagePlaceholder: "🍓"
+                },
+                bebida_cafe_gelado_proteico: {
+                    id: 'bebida_cafe_gelado_proteico', categoryKey: 'bebida', categoryName: "Bebida Proteica", title: 'Café Gelado Proteico (Mocha ou Baunilha)',
+                    explanation: 'Uma forma deliciosa e prática de consumir sua dose de proteína e cafeína, ideal para começar o dia, como pré-treino ou um lanche energético.',
+                    ingredients: ["1 xícara (240ml) de café forte coado e já frio (ou espresso duplo)", "1 scoop (aproximadamente 30g) de whey protein sabor baunilha, chocolate ou café", "Cubos de gelo a gosto", "Opcional: 50-100ml de leite vegetal sem açúcar (amêndoas, coco, aveia) para mais cremosidade, adoçante a gosto (se o whey não for doce o suficiente), cacau em pó ou canela para polvilhar"],
+                    steps: [
+                        "Prepare o café forte e deixe esfriar completamente. Você pode prepará-lo com antecedência e guardar na geladeira.",
+                        "Em uma coqueteleira (shaker) ou no copo do liquidificador, adicione o café frio.",
+                        "Acrescente o scoop de whey protein do sabor escolhido.",
+                        "Se for usar leite vegetal para mais cremosidade, adicione-o agora.",
+                        "Se desejar mais doce, adicione seu adoçante preferido a gosto.",
+                        "Feche bem a coqueteleira e agite vigorosamente por cerca de 30 segundos, ou até que o whey protein esteja completamente dissolvido e a mistura espumosa. Se estiver usando o liquidificador, bata por alguns segundos até ficar homogêneo.",
+                        "Encha um copo grande com cubos de gelo.",
+                        "Despeje cuidadosamente a mistura de café proteico sobre o gelo.",
+                        "Se desejar, polvilhe um pouco de cacau em pó (se usou whey de chocolate) ou canela em pó (se usou whey de baunilha) por cima para decorar.",
+                        "Mexa levemente com um canudo, se necessário, e sirva imediatamente."
+                    ],
+                    macros: { "Proteínas": 40, "Carboidratos": 30, "Gorduras": 30 },
+                    imagePlaceholder: "☕"
+                },
+                bebida_sucha_maracuja: {
+                    id: 'bebida_sucha_maracuja', categoryKey: 'bebida', categoryName: "Bebida Funcional", title: 'Suchá Calmante de Maracujá com Camomila',
+                    explanation: 'Uma bebida que combina as propriedades calmantes e relaxantes do maracujá e da camomila. Perfeita para consumir à noite ou em momentos de estresse, ajudando a relaxar.',
+                    ingredients: ["Polpa de 1 maracujá azedo maduro (com sementes)", "1 xícara (240ml) de chá de camomila forte, já preparado e frio", "1/2 xícara (120ml) de água filtrada (opcional, para diluir se preferir)", "Adoçante natural a gosto (mel, stevia, xilitol - opcional)", "Cubos de gelo a gosto", "Folhas de hortelã para decorar (opcional)"],
+                    steps: [
+                        "Prepare o chá de camomila: Ferva 1 xícara de água e adicione 1-2 sachês de chá de camomila (ou 1 colher de sopa de flores secas de camomila). Deixe em infusão por 5-10 minutos. Coe (se usou flores soltas) e deixe esfriar completamente. Para acelerar, pode levar à geladeira.",
+                        "No copo do liquidificador, adicione a polpa do maracujá (com as sementes, que são comestíveis e ricas em fibras, mas se preferir um suco mais liso, pode bater e coar a polpa antes).",
+                        "Acrescente o chá de camomila já frio ao liquidificador.",
+                        "Se desejar uma bebida menos concentrada, adicione a 1/2 xícara de água filtrada.",
+                        "Se for adoçar, adicione o adoçante de sua preferência a gosto.",
+                        "Bata todos os ingredientes no liquidificador por cerca de 30 segundos a 1 minuto, apenas para misturar bem e triturar um pouco as sementes do maracujá (se as manteve).",
+                        "Encha os copos com cubos de gelo.",
+                        "Despeje o suchá sobre o gelo.",
+                        "Decore com algumas folhas de hortelã fresca, se desejar.",
+                        "Sirva imediatamente e desfrute desta bebida relaxante."
+                    ],
+                    macros: { "Proteínas": 2, "Carboidratos": 90, "Gorduras": 8 },
+                    imagePlaceholder: "🌼"
+                }
+            }
+        };
+
+        const contentArea = document.getElementById('content-area');
+        const navButtons = document.querySelectorAll('.nav-button');
+        const saveEbookButton = document.getElementById('save-ebook-button');
+        let currentChart = null;
+
+        function formatRecipeForEbook(recipeData) {
+            let text = `RECEITA: ${recipeData.title.toUpperCase()}\n`;
+            text += `CATEGORIA: ${recipeData.categoryName}\n\n`;
+            text += `DESCRIÇÃO:\n${recipeData.explanation}\n\n`;
+            text += `INGREDIENTES:\n`;
+            recipeData.ingredients.forEach(ing => { text += `- ${ing}\n`; });
+            text += `\nMODO DE PREPARO:\n`;
+            recipeData.steps.forEach((step, index) => { text += `${index + 1}. ${step}\n`; });
+            if (recipeData.macros) {
+                text += `\nMACRONUTRIENTES (Estimativa):\n`;
+                text += `  Proteínas: ${recipeData.macros.Proteínas}%\n`;
+                text += `  Carboidratos: ${recipeData.macros.Carboidratos}%\n`;
+                text += `  Gorduras: ${recipeData.macros.Gorduras}%\n`;
+            }
+            text += `\n--------------------------------------------------\n\n`;
+            return text;
+        }
+
+        function generateEbookContent() {
+            let ebookText = "MEU EBOOK DE RECEITAS FITNESS\n\n";
+            ebookText += "Este ebook foi gerado a partir do aplicativo interativo de Receitas Fitness.\n";
+            ebookText += "==================================================\n\n";
+
+            const sortedRecipeKeys = Object.keys(contentData.receitas).sort((a,b) => {
+                const catA = contentData.receitas[a].categoryName.toUpperCase();
+                const catB = contentData.receitas[b].categoryName.toUpperCase();
+                if (catA < catB) return -1;
+                if (catA > catB) return 1;
+                return contentData.receitas[a].title.localeCompare(contentData.receitas[b].title);
+            });
+
+            sortedRecipeKeys.forEach(key => {
+                 if (contentData.receitas[key].title && contentData.receitas[key].categoryName) {
+                    ebookText += formatRecipeForEbook(contentData.receitas[key]);
+                }
+            });
+            return ebookText;
+        }
+
+        saveEbookButton.addEventListener('click', () => {
+            const ebookContent = generateEbookContent();
+            const blob = new Blob([ebookContent], { type: 'text/plain;charset=utf-8' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = 'Ebook_Receitas_Fitness_Detalhado.txt';
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(link.href);
+        });
+
+        function renderRecipeList(categoryKey) {
+            contentArea.innerHTML = '';
+            const recipesInCategory = Object.values(contentData.receitas).filter(recipe => recipe.categoryKey === categoryKey);
+            
+            if (recipesInCategory.length === 0) {
+                contentArea.innerHTML = `<p class="text-center text-stone-500">Nenhuma receita encontrada para esta categoria.</p>`;
+                return;
+            }
+
+            const categoryName = recipesInCategory[0].categoryName;
+            const titleHtml = `<h2 class="text-3xl font-bold text-emerald-600 mb-6 text-center">${categoryName}</h2>`;
+            
+            const recipeListContainer = document.createElement('div');
+            recipeListContainer.className = "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6";
+
+            recipesInCategory.sort((a,b) => a.title.localeCompare(b.title)).forEach(recipe => {
+                const card = document.createElement('div');
+                card.className = "recipe-card bg-stone-50 p-5 rounded-xl border border-stone-200 shadow-sm cursor-pointer hover:shadow-md flex flex-col justify-between";
+                card.dataset.recipeId = recipe.id;
+                card.innerHTML = `
+                    <div>
+                        <div class="text-5xl mb-3 text-center">${recipe.imagePlaceholder || '🍽️'}</div>
+                        <h3 class="text-xl font-semibold text-emerald-500 mb-2 text-center">${recipe.title}</h3>
+                        <p class="text-sm text-stone-500 text-center line-clamp-3">${recipe.explanation.substring(0,100)}...</p>
+                    </div>
+                    <button class="mt-4 w-full bg-emerald-500 hover:bg-emerald-600 text-white text-sm py-2 px-3 rounded-lg view-recipe-button">Ver Receita</button>
+                `;
+                card.querySelector('.view-recipe-button').addEventListener('click', (e) => {
+                    e.stopPropagation(); // Impede que o clique no botão propague para o card
+                    renderContent(recipe.id, true); 
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    document.querySelector(`.category-nav-button[data-category-key="${categoryKey}"]`).classList.add('active');
+                });
+                 card.addEventListener('click', () => { // Adiciona listener ao card também, caso o usuário clique fora do botão
+                    renderContent(recipe.id, true); 
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    document.querySelector(`.category-nav-button[data-category-key="${categoryKey}"]`).classList.add('active');
+                });
+                recipeListContainer.appendChild(card);
+            });
+            contentArea.innerHTML = titleHtml;
+            contentArea.appendChild(recipeListContainer);
+        }
+
+
+        function renderContent(keyOrId, isRecipe = false) {
+            contentArea.innerHTML = ''; 
+            contentArea.classList.remove('fade-in');
+            void contentArea.offsetWidth; 
+            contentArea.classList.add('fade-in');
+
+            if (currentChart) {
+                currentChart.destroy();
+                currentChart = null;
+            }
+
+            if (keyOrId === 'intro') {
+                contentArea.innerHTML = contentData.intro.content;
+                return;
+            }
+
+            if (isRecipe) { 
+                const data = contentData.receitas[keyOrId];
+                if (!data) {
+                    contentArea.innerHTML = "<p class='text-center text-red-500'>Receita não encontrada.</p>";
+                    return;
+                }
+
+                const backButtonHtml = `<button id="back-to-category" data-category="${data.categoryKey}" class="mb-6 inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-emerald-700 bg-emerald-100 hover:bg-emerald-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clip-rule="evenodd" /></svg>
+                    Voltar para ${data.categoryName}
+                </button>`;
+                
+                const gridContainer = document.createElement('div');
+                gridContainer.className = "grid grid-cols-1 lg:grid-cols-2 gap-8 items-start";
+                
+                const textContent = document.createElement('div');
+                const explanationHtml = `<h3 class="text-3xl font-bold text-emerald-500 mb-3">${data.title}</h3><p class="text-stone-600 mb-6 text-base">${data.explanation}</p>`;
+                const ingredientsHtml = `<h4 class="font-semibold text-xl text-stone-700 mb-2">Ingredientes</h4><ul class="list-disc list-inside text-stone-600 space-y-1 mb-6 text-base">${data.ingredients.map(item => `<li>${item}</li>`).join('')}</ul>`;
+                const stepsHtml = `<h4 class="font-semibold text-xl text-stone-700 mb-2">Modo de Preparo</h4><ol class="list-decimal list-inside text-stone-600 space-y-2 text-base">${data.steps.map(item => `<li>${item}</li>`).join('')}</ol>`;
+                textContent.innerHTML = explanationHtml + ingredientsHtml + stepsHtml;
+
+                const chartContainerWrapper = document.createElement('div');
+                chartContainerWrapper.className = "w-full lg:sticky lg:top-20"; 
+                
+                const chartBox = document.createElement('div');
+                chartBox.className = "bg-stone-100 rounded-xl p-4 border border-stone-200";
+                chartBox.innerHTML = `
+                    <h4 class="font-semibold text-lg text-stone-700 mb-2 text-center">Distribuição de Macronutrientes (Estimativa)</h4>
+                    <div class="chart-container relative h-64 md:h-72 w-full max-w-xs mx-auto">
+                        <canvas id="macroChart"></canvas>
+                    </div>
+                `;
+                chartContainerWrapper.appendChild(chartBox);
+                
+                contentArea.innerHTML = backButtonHtml;
+                gridContainer.appendChild(textContent);
+                if (data.macros) {
+                    gridContainer.appendChild(chartContainerWrapper);
+                }
+                contentArea.appendChild(gridContainer);
+                
+                if (data.macros) {
+                    renderChart(data.macros);
+                }
+
+                document.getElementById('back-to-category').addEventListener('click', function() {
+                    const categoryKeyToReturn = this.dataset.category;
+                    renderContent(categoryKeyToReturn, false);
+                    navButtons.forEach(btn => btn.classList.remove('active'));
+                    document.querySelector(`.category-nav-button[data-category-key="${categoryKeyToReturn}"]`).classList.add('active');
+                });
+
+            } else { 
+                renderRecipeList(keyOrId);
+            }
+        }
+
+        function renderChart(macros) {
+            if (currentChart) {
+                currentChart.destroy();
+            }
+            const ctx = document.getElementById('macroChart').getContext('2d');
+            currentChart = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(macros),
+                    datasets: [{
+                        data: Object.values(macros),
+                        backgroundColor: ['#34D399', '#FBBF24', '#F87171'], 
+                        borderColor: '#FFFFFF',
+                        borderWidth: 3,
+                        hoverOffset: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    cutout: '60%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { padding: 15, font: { size: 12, family: 'Inter' } }
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.parsed !== null) { label += context.parsed + '%'; }
+                                    return label;
+                                }
+                            },
+                            padding: 8,
+                            titleFont: { size: 14, family: 'Inter' }, bodyFont: { size: 12, family: 'Inter' },
+                            backgroundColor: '#334155', titleColor: '#FFFFFF', bodyColor: '#FFFFFF',
+                            borderColor: '#475569', borderWidth: 1
+                        }
+                    }
+                }
+            });
+        }
+        
+        navButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                navButtons.forEach(btn => btn.classList.remove('active'));
+                button.classList.add('active');
+                
+                const categoryKey = button.dataset.categoryKey;
+                if (categoryKey) {
+                    renderContent(categoryKey, false); 
+                } else if (button.id === 'nav-intro') {
+                    renderContent('intro');
+                }
+            });
+        });
+
+        document.addEventListener('DOMContentLoaded', () => {
+            renderContent('intro');
+        });
+
+    </script>
+</body>
+</html>
